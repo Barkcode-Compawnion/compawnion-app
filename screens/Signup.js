@@ -10,7 +10,7 @@ export default function Signup() {
   const [confirmPassword, setConfirmPassword] = useState('');
   const [isPasswordFocused, setIsPasswordFocused] = useState(false);
 
-  const handleSignupPress = () => {
+  const handleSignupPress = async () => {
     if (!username || !email || !password || !confirmPassword) {
       Alert.alert("Error", "Please fill out all fields.");
       return;
@@ -21,11 +21,27 @@ export default function Signup() {
       return;
     }
 
-    console.log("Username:", username);
-    console.log("Email:", email);
-    console.log("Password:", password);
+    try {
+      const response = await fetch('http://localhost:3000/Compawnions/register', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ username, email, password }),
+      });
 
-    navigation.navigate('Plscheck');
+      const data = await response.json();
+
+      if (response.ok) {
+        Alert.alert('Success', 'Account created successfully!');
+        navigation.navigate('Plscheck');  
+      } else {
+        Alert.alert('Signup Failed', data.message || 'An error occurred during registration.');
+      }
+    } catch (error) {
+      console.error(error);
+      Alert.alert('Error', 'Could not connect to the server.');
+    }
   };
 
   const handlePressLogin = () => {
@@ -117,7 +133,7 @@ const styles = StyleSheet.create({
     fontSize: 70,
     color: '#C35E26',
     marginRight: 10,
-    marginTop:-30,
+    marginTop: -30,
   },
   title: {
     fontSize: 32,

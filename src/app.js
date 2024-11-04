@@ -9,6 +9,10 @@ import Signup from "../screens/Signup";
 import Plscheck from "../screens/Plscheck";
 import Homepage from "../screens/Homepage";
 import Pets from "../screens/Pets";
+import Profilescreen from "../screens/Profilescreen";
+import ChangePassword from "../screens/Changpassword";
+import Medicalsched from "../screens/Medicalsched";
+import Compawnionsched from "../screens/Compawnionsched";
 const Stack = createNativeStackNavigator();
 
 export default function App() {
@@ -25,6 +29,10 @@ export default function App() {
                 <Stack.Screen name="Plscheck" component={Plscheck}/>
                 <Stack.Screen name="Homepage" component={Homepage}/>
                 <Stack.Screen name="Pets" component={Pets}/>
+                <Stack.Screen name="Profilescreen" component={Profilescreen}/>
+                <Stack.Screen name="Changepassword" component={ChangePassword}/>
+                <Stack.Screen name="Medicalsched" component={Medicalsched}/>
+                <Stack.Screen name="Compawnionsched" component={Compawnionsched}/>
             </Stack.Navigator>
         </NavigationContainer>
     );
