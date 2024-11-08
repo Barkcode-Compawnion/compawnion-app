@@ -1,5 +1,7 @@
 import React from 'react';
-import { Text, View, StyleSheet, TouchableOpacity,Image } from 'react-native';
+import { Text, View, StyleSheet, TouchableOpacity,Image, PixelRatio } from 'react-native';
+
+const scale = PixelRatio.get();
 
 export default function Startapp({ navigation }) {
   const handleButtonPress = () => {
@@ -8,7 +10,7 @@ export default function Startapp({ navigation }) {
 
   return (
     <View style={styles.container}>
-      <Text style={styles.text}>
+      <Text style={[styles.text, { fontFamily: 'Poppins-Regular' }]}>
         Love{"\n"}Beyond{"\n"}<Text style={styles.rescuetext}>Rescue</Text>.
       </Text>
       <TouchableOpacity style={styles.button} onPress={handleButtonPress} activeOpacity={0.7}>
@@ -22,6 +24,7 @@ export default function Startapp({ navigation }) {
 
 const styles = StyleSheet.create({
   container: {
+    position: 'absolute',
     flex: 1,
     backgroundColor: '#E9E9E9',
     justifyContent: 'flex-start',
@@ -30,13 +33,12 @@ const styles = StyleSheet.create({
   text: {
     fontSize: 50,
     fontWeight: 'bold',
-    fontFamily: 'Poppins-Regular',
     color: '#333',
     position: 'absolute',
     zIndex: 1,
     textAlign: 'left',
-    marginLeft: 40,
-    marginTop: 70,
+    top: 70,
+    left: 50,
   },
   rescuetext: {
     color: '#C35E26',
@@ -44,7 +46,6 @@ const styles = StyleSheet.create({
   salita: {
     fontSize: 20,
     fontWeight: 'bold',
-    fontFamily: 'Poppins-Regular',
     color: '#000000',
     textAlign: 'center',
     marginTop: 570,
@@ -53,15 +54,17 @@ const styles = StyleSheet.create({
     position:'absolute',
   },
   button: {
-    marginTop: 620,
-    marginLeft: 95,
+    top: 610,
+    left: 95,
     padding: 10,
     backgroundColor: '#C35E26',
     borderRadius: 20,
-    width:200,
-    height:47,
+    width: 200,
+    height: 30,
     zIndex:0,
     position:'absolute',
+    paddingHorizontal: 30,
+    paddingVertical: 2,
   },
   buttonText: {
     color: '#FFFFFF',
@@ -72,7 +75,7 @@ const styles = StyleSheet.create({
     width: 270,
     height: 270,
     position: 'absolute',
-    top: 255,
+    top: 270,
     left: 60,
     zIndex: 0,
   },

@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { View, Text, TextInput, StyleSheet, TouchableOpacity, Alert } from 'react-native';
+import { View, Text, TextInput, StyleSheet, TouchableOpacity, Alert,Image } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
 
 export default function Changepassword() {
@@ -27,7 +27,7 @@ export default function Changepassword() {
   return (
     <View style={styles.container}>
       <TouchableOpacity style={styles.backButton} onPress={() => navigation.goBack()}>
-        <Text style={styles.backArrow}>←</Text>
+      <Image source={require('../assets/pcs/Backbutton.png')} style={styles.back}/>
       </TouchableOpacity>
       <Text style={styles.title}>Change Password</Text>
 
@@ -70,14 +70,16 @@ const styles = StyleSheet.create({
     backgroundColor: '#F6F6F6',
     alignItems: 'center',
   },
+  back: {
+    width: 70,
+    height: 30,
+    resizeMode: 'contain',
+    top: 20,
+  },
   backButton: {
     position: 'absolute',
     top: 20,
     left: 10,
-  },
-  backArrow: {
-    fontSize: 24,
-    color: '#C35E26',
   },
   title: {
     fontSize: 24,
@@ -92,7 +94,7 @@ const styles = StyleSheet.create({
     borderWidth: 1,
     borderRadius: 8,
     paddingHorizontal: 15,
-    marginTop: 10,
+    marginTop: 20,
     backgroundColor: '#fff',
     fontSize: 16,
   },

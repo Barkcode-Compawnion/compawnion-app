@@ -20,7 +20,7 @@ export default function Login() {
     // Login button handler
     const handleLoginPress = async () => {
         try {
-            const response = await fetch('http://localhost:3000/Compawnions/register', {
+            const response = await fetch('https://compawnion-backend.onrender.com', {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
@@ -109,7 +109,7 @@ const styles = StyleSheet.create({
         width: 300,
         borderColor: '#ddd',
         borderWidth: 1,
-        borderRadius: 8,
+        borderRadius: 30,
         paddingHorizontal: 15,
         marginTop: 260,
         marginLeft: 50,
@@ -123,7 +123,7 @@ const styles = StyleSheet.create({
         width: 300,
         borderColor: '#ddd',
         borderWidth: 1,
-        borderRadius: 8,
+        borderRadius: 30,
         paddingHorizontal: 15,
         marginTop: 360,
         marginLeft: 50,
@@ -133,16 +133,18 @@ const styles = StyleSheet.create({
         zIndex: 1,
     },
     button: {
-        height: 50,
-        width: 200,
+        height: 30,
+        width: 180,
         backgroundColor: '#C35E26',
-        borderRadius: 20,
+        borderRadius: 30,
         justifyContent: 'center',
         alignItems: 'center',
         zIndex: 1,
         position: 'absolute',
         marginTop: 470,
-        marginLeft: 100,
+        left: 110,
+        paddingVertical: 2,
+        paddingHorizontal: 30,
     },
     buttonText: {
         color: '#fff',
@@ -177,14 +179,14 @@ const styles = StyleSheet.create({
         zIndex: 0,
     },
     forgotpass: {
-        fontSize: 10,
+        fontSize: 12,
         color: '#45362F',
         fontWeight: 'bold',
         textDecorationLine: 'underline',
         zIndex: 0,
         position: 'absolute',
         marginTop: 420,
-        marginLeft: 138,
+        left:135,
     },
     haveacc: {
         fontSize: 13,

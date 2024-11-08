@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Text, View, TextInput, StyleSheet, TouchableOpacity, Alert } from 'react-native';
+import { Text, View, TextInput, StyleSheet, TouchableOpacity, Alert, Image } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
 
 export default function Signup() {
@@ -10,9 +10,24 @@ export default function Signup() {
   const [confirmPassword, setConfirmPassword] = useState('');
   const [isPasswordFocused, setIsPasswordFocused] = useState(false);
 
+  const validateEmail = (email) => {
+    const emailPattern = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    return emailPattern.test(email);
+  };
+
   const handleSignupPress = async () => {
     if (!username || !email || !password || !confirmPassword) {
       Alert.alert("Error", "Please fill out all fields.");
+      return;
+    }
+
+    if (!validateEmail(email)) {
+      Alert.alert("Error", "Please enter a valid email address.");
+      return;
+    }
+
+    if (password.length < 8) {
+      Alert.alert("Error", "Password must be at least 8 characters long.");
       return;
     }
 
@@ -22,7 +37,7 @@ export default function Signup() {
     }
 
     try {
-      const response = await fetch('http://localhost:3000/Compawnions/register', {
+      const response = await fetch('https://compawnion-backend.onrender.com', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -52,7 +67,7 @@ export default function Signup() {
     <View style={styles.container}>
       <View style={styles.header}>
         <TouchableOpacity onPress={handlePressLogin}>
-          <Text style={styles.backArrow}>←</Text>
+        <Image source={require('../assets/pcs/Backbutton.png')} style={styles.back}/>
         </TouchableOpacity>
         <Text style={styles.title}>Sign Up</Text>
       </View>
@@ -129,11 +144,10 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     marginTop: 40,
   },
-  backArrow: {
-    fontSize: 70,
-    color: '#C35E26',
-    marginRight: 10,
-    marginTop: -30,
+  back: {
+    width: 70,
+    height: 30,
+    resizeMode: 'contain',
   },
   title: {
     fontSize: 32,
@@ -152,7 +166,7 @@ const styles = StyleSheet.create({
     width: '90%',
     borderColor: '#ddd',
     borderWidth: 1,
-    borderRadius: 8,
+    borderRadius: 30,
     paddingHorizontal: 15,
     marginTop: 5,
     fontSize: 16,
@@ -168,8 +182,8 @@ const styles = StyleSheet.create({
     textAlign: 'left',
   },
   button: {
-    height: 50,
-    width: '90%',
+    height: 40,
+    width: 250,
     backgroundColor: '#C35E26',
     borderRadius: 20,
     justifyContent: 'center',

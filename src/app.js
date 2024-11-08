@@ -13,6 +13,10 @@ import Profilescreen from "../screens/Profilescreen";
 import ChangePassword from "../screens/Changpassword";
 import Medicalsched from "../screens/Medicalsched";
 import Compawnionsched from "../screens/Compawnionsched";
+import Addschedule from "../screens/Addschedule";
+import Trustedveti from "../screens/Trustedveti";
+import Medicalinfo from "../screens/Medicalinfo";
+
 const Stack = createNativeStackNavigator();
 
 export default function App() {
@@ -33,6 +37,9 @@ export default function App() {
                 <Stack.Screen name="Changepassword" component={ChangePassword}/>
                 <Stack.Screen name="Medicalsched" component={Medicalsched}/>
                 <Stack.Screen name="Compawnionsched" component={Compawnionsched}/>
+                <Stack.Screen name="Addschedule" component={Addschedule}/>
+                <Stack.Screen name="Trustedveti" component={Trustedveti}/>
+                <Stack.Screen name="Medicalinfo" component={Medicalinfo}/>
             </Stack.Navigator>
         </NavigationContainer>
     );

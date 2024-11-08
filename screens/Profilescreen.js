@@ -15,25 +15,22 @@ export default function Profilescreen() {
   };
 
   const handleChangePassword = () => {
-    // Navigate to Change Password screen
     navigation.navigate('Changepassword');
   };
 
   const handleLogout = () => {
-    // Add logout functionality here
     Alert.alert('Logout', 'You have been logged out.');
     navigation.navigate('Login');
   };
 
   const handleContactSupport = () => {
-    // Navigate to Contact Support or open support contact info
-    Alert.alert('Contact Support', 'You can reach out to support@example.com');
+    Alert.alert('Contact Support', 'You can reach out to barkcodecompawnion@gmail.com ');
   };
 
   return (
     <View style={styles.container}>
       <TouchableOpacity style={styles.backButton} onPress={() => navigation.goBack()}>
-        <Text style={styles.backArrow}>←</Text>
+      <Image source={require('../assets/pcs/Backbutton.png')} style={styles.back}/>
       </TouchableOpacity>
       <Text style={styles.title}>Account Settings</Text>
       
@@ -77,7 +74,7 @@ export default function Profilescreen() {
         <Text style={styles.buttonText}>Save Changes</Text>
       </TouchableOpacity>
       <TouchableOpacity style={styles.changePasswordButton} onPress={handleChangePassword}>
-        <Text style={styles.buttonText}>Change Password</Text>
+        <Text style={styles.buttonCpass}>Change Password</Text>
       </TouchableOpacity>
       <TouchableOpacity style={styles.logoutButton} onPress={handleLogout}>
         <Text style={styles.buttonText}>Log Out</Text>
@@ -94,17 +91,18 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     padding: 20,
-    backgroundColor: '#F6F6F6',
+    backgroundColor: '#E9E9E9',
     alignItems: 'center',
+  },
+  back: {
+    width: 70,
+    height: 30,
+    resizeMode: 'contain',
   },
   backButton: {
     position: 'absolute',
-    top: 20,
+    top: 40,
     left: 10,
-  },
-  backArrow: {
-    fontSize: 24,
-    color: '#C35E26',
   },
   title: {
     fontSize: 24,
@@ -129,7 +127,7 @@ const styles = StyleSheet.create({
     width: '90%',
     borderColor: '#ddd',
     borderWidth: 1,
-    borderRadius: 8,
+    borderRadius: 20,
     paddingHorizontal: 15,
     marginTop: 10,
     backgroundColor: '#fff',
@@ -173,5 +171,9 @@ const styles = StyleSheet.create({
     color: '#C35E26',
     textDecorationLine: 'underline',
     marginTop: 20,
+  },
+  buttonCpass: {
+    color: '#000000',
+    fontSize: 16,
   },
 });

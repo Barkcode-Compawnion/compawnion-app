@@ -1,5 +1,5 @@
 import React from 'react';
-import { View, Text, Image, StyleSheet, TouchableOpacity } from 'react-native';
+import { View, Text, Image, StyleSheet, TouchableOpacity, Alert } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
 
 export default function Compawnionsched(){
@@ -13,14 +13,21 @@ export default function Compawnionsched(){
         navigation.navigate('Medicalsched')
     };
 
+    const handleContactSupport = () => {
+        Alert.alert('Contact Support', 'You can reach out to barkcodecompawnion@gmail.com ');
+    };
+
     return(
     <View style ={styles.container}>
         <Text style={styles.title}>
             Compawnions{"\n"}Schedules
         </Text>
+        <TouchableOpacity onPress={handleContactSupport}>
+        <Text style={styles.contactSupport}>Contact Support</Text>
+      </TouchableOpacity>
         <View style={styles.footer}>                
                 <TouchableOpacity style={styles.footerButton} onPress={handleMedical}>
-                <Image source={require('../assets/pcs/Medicalb.png')}
+                <Image source={require('../assets/pcs/Medical.png')}
                 style={styles.icon}/>
                 </TouchableOpacity>
                 <TouchableOpacity style={styles.footerButton} onPress={handleHomep}>
@@ -39,7 +46,7 @@ const styles= StyleSheet.create({
     container: {
         flex: 1,
         padding: 20,
-        backgroundColor: '#F5F5F5',
+        backgroundColor: '#E9E9E9',
     },
     title:{
         fontSize: 40,
@@ -68,6 +75,13 @@ const styles= StyleSheet.create({
     footerButton: {
         alignItems: 'center',
         padding: 10,
+    },
+    contactSupport: {
+        fontSize: 12,
+        color: '#C35E26',
+        textDecorationLine: 'underline',
+        top: 670,
+        left: 140,
     },
     icon: {
         width: 70,
