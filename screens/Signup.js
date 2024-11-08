@@ -1,6 +1,14 @@
-import React, { useState } from 'react';
-import { Text, View, TextInput, StyleSheet, TouchableOpacity, Alert, Image } from 'react-native';
-import { useNavigation } from '@react-navigation/native';
+import React, {useState} from 'react';
+import {
+  Text,
+  View,
+  TextInput,
+  StyleSheet,
+  TouchableOpacity,
+  Alert,
+  Image,
+} from 'react-native';
+import {useNavigation} from '@react-navigation/native';
 
 export default function Signup() {
   const navigation = useNavigation();
@@ -10,40 +18,49 @@ export default function Signup() {
   const [confirmPassword, setConfirmPassword] = useState('');
   const [isPasswordFocused, setIsPasswordFocused] = useState(false);
 
-  const validateEmail = (email) => {
+  const validateEmail = email => {
     const emailPattern = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
     return emailPattern.test(email);
   };
 
   const handleSignupPress = async () => {
     if (!username || !email || !password || !confirmPassword) {
-      Alert.alert("Error", "Please fill out all fields.");
+      Alert.alert('Error', 'Please fill out all fields.');
       return;
     }
 
     if (!validateEmail(email)) {
-      Alert.alert("Error", "Please enter a valid email address.");
+      Alert.alert('Error', 'Please enter a valid email address.');
       return;
     }
 
     if (password.length < 8) {
-      Alert.alert("Error", "Password must be at least 8 characters long.");
+      Alert.alert('Error', 'Password must be at least 8 characters long.');
       return;
     }
 
     if (password !== confirmPassword) {
-      Alert.alert("Error", "Passwords do not match.");
+      Alert.alert('Error', 'Passwords do not match.');
       return;
     }
 
     try {
-      const response = await fetch('https://compawnion-backend.onrender.com/admins', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
+      const response = await fetch(
+        'https://compawnion-backend.onrender.com/compawnions/register',
+        {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({
+            accountCreate: {
+              Username: username,
+              Email: email,
+              Password: password,
+            },
+          }),
         },
-        body: JSON.stringify({ username, email, password }),
-      });
+      );
 
       let data;
       try {
@@ -55,10 +72,13 @@ export default function Signup() {
 
       if (response.ok) {
         Alert.alert('Success', 'Account created successfully!');
-        navigation.navigate('Plscheck');
+        navigation.navigate('Plscheck'); // Navigate to the next screen
       } else {
         console.log('Server Response:', data);
-        Alert.alert('Signup Failed', data.message || 'An error occurred during registration.');
+        Alert.alert(
+          'Signup Failed',
+          data.message || 'An error occurred during registration.',
+        );
       }
     } catch (error) {
       console.error('Fetch error:', error);
@@ -74,7 +94,10 @@ export default function Signup() {
     <View style={styles.container}>
       <View style={styles.header}>
         <TouchableOpacity onPress={handlePressLogin}>
-          <Image source={require('../assets/pcs/Backbutton.png')} style={styles.back} />
+          <Image
+            source={require('../assets/pcs/Backbutton.png')}
+            style={styles.back}
+          />
         </TouchableOpacity>
         <Text style={styles.title}>Sign Up</Text>
       </View>
@@ -113,7 +136,8 @@ export default function Signup() {
       />
       {isPasswordFocused && (
         <Text style={styles.passwordRequirement}>
-          Must be 8 characters long with a combination of letters, numbers, and symbols.
+          Must be 8 characters long with a combination of letters, numbers, and
+          symbols.
         </Text>
       )}
 
