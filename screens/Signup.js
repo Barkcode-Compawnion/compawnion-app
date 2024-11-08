@@ -37,7 +37,7 @@ export default function Signup() {
     }
 
     try {
-      const response = await fetch('https://compawnion-backend.onrender.com', {
+      const response = await fetch('https://compawnion-backend.onrender.com/admins', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -45,16 +45,23 @@ export default function Signup() {
         body: JSON.stringify({ username, email, password }),
       });
 
-      const data = await response.json();
+      let data;
+      try {
+        data = await response.json();
+      } catch (parseError) {
+        console.error('Error parsing response:', parseError);
+        throw new Error('Unexpected server response.');
+      }
 
       if (response.ok) {
         Alert.alert('Success', 'Account created successfully!');
-        navigation.navigate('Plscheck');  
+        navigation.navigate('Plscheck');
       } else {
+        console.log('Server Response:', data);
         Alert.alert('Signup Failed', data.message || 'An error occurred during registration.');
       }
     } catch (error) {
-      console.error(error);
+      console.error('Fetch error:', error);
       Alert.alert('Error', 'Could not connect to the server.');
     }
   };
@@ -67,7 +74,7 @@ export default function Signup() {
     <View style={styles.container}>
       <View style={styles.header}>
         <TouchableOpacity onPress={handlePressLogin}>
-        <Image source={require('../assets/pcs/Backbutton.png')} style={styles.back}/>
+          <Image source={require('../assets/pcs/Backbutton.png')} style={styles.back} />
         </TouchableOpacity>
         <Text style={styles.title}>Sign Up</Text>
       </View>
@@ -81,7 +88,7 @@ export default function Signup() {
         value={username}
         autoCapitalize="none"
       />
-      
+
       <Text style={styles.label}>Email</Text>
       <TextInput
         style={styles.input}
@@ -92,7 +99,7 @@ export default function Signup() {
         keyboardType="email-address"
         autoCapitalize="none"
       />
-      
+
       <Text style={styles.label}>Password</Text>
       <TextInput
         style={styles.input}
@@ -109,7 +116,7 @@ export default function Signup() {
           Must be 8 characters long with a combination of letters, numbers, and symbols.
         </Text>
       )}
-      
+
       <Text style={styles.label}>Confirm Password</Text>
       <TextInput
         style={styles.input}
@@ -119,11 +126,11 @@ export default function Signup() {
         value={confirmPassword}
         secureTextEntry
       />
-      
+
       <TouchableOpacity style={styles.button} onPress={handleSignupPress}>
         <Text style={styles.buttonText}>Sign Up</Text>
       </TouchableOpacity>
-      
+
       <Text style={styles.haveAcc}>Already have an account?</Text>
       <TouchableOpacity onPress={handlePressLogin}>
         <Text style={styles.login}>Log in</Text>

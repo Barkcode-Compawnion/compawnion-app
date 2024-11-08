@@ -20,7 +20,7 @@ export default function Login() {
     // Login button handler
     const handleLoginPress = async () => {
         try {
-            const response = await fetch('https://compawnion-backend.onrender.com', {
+            const response = await fetch('https://compawnion-backend.onrender.com/Admins', {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
