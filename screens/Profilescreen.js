@@ -1,17 +1,84 @@
 import React, { useState } from 'react';
 import { View, Text, TextInput, StyleSheet, TouchableOpacity, Image, Alert } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
+import { launchImageLibrary } from 'react-native-image-picker'; // Import Image Picker
+import AsyncStorage from '@react-native-async-storage/async-storage';
+import axios from 'axios'; // Assuming you are using axios for HTTP requests
 
-export default function Profilescreen() {
+export default function Profilescreen({ route }) {
   const navigation = useNavigation();
   const [firstName, setFirstName] = useState('');
   const [lastName, setLastName] = useState('');
   const [username, setUsername] = useState('');
   const [email, setEmail] = useState('');
   const [phoneNumber, setPhoneNumber] = useState('');
+  const [profileImage, setProfileImage] = useState(route?.params?.profileImage || ''); // Default to current profile picture
 
-  const handleSaveChanges = () => {
-    Alert.alert('Success', 'Your changes have been saved.');
+  const loadProfileImage = async () => {
+    const savedProfileImage = await AsyncStorage.getItem('profileImage');
+    if (savedProfileImage) {
+      setProfileImage(savedProfileImage);
+    }
+  };
+
+  // Handle changing profile picture
+  const handleChangeImage = () => {
+    launchImageLibrary({ mediaType: 'photo', quality: 0.5 }, (response) => {
+      if (response.didCancel) {
+        return;
+      }
+      if (response.errorCode) {
+        console.log('Error picking image:', response.errorMessage);
+        Alert.alert('Error', 'Failed to pick image');
+      } else {
+        const newProfileImage = response.assets[0].uri;
+        setProfileImage(newProfileImage); // Update profile picture URI
+        AsyncStorage.setItem('profileImage', newProfileImage); // Save to AsyncStorage
+      }
+    });
+  };
+
+  // Save changes including profile image to backend
+  const handleSaveChanges = async () => {
+    try {
+      // Create form data to send to backend
+      const formData = new FormData();
+      formData.append('firstName', firstName);
+      formData.append('lastName', lastName);
+      formData.append('username', username);
+      formData.append('email', email);
+      formData.append('phoneNumber', phoneNumber);
+
+      if (profileImage) {
+        const imageUri = profileImage;
+        const imageName = imageUri.split('/').pop();
+        const imageType = imageUri.match(/\.(\w+)$/)[1];
+        
+        // Convert the image to a format that can be uploaded
+        const image = {
+          uri: imageUri,
+          type: `image/${imageType}`,
+          name: imageName,
+        };
+        
+        formData.append('profileImage', image); // Append the image to form data
+      }
+
+      const response = await axios.post('https://your-backend-url.com/updateProfile', formData, {
+        headers: {
+          'Content-Type': 'multipart/form-data', // Required for sending files
+        },
+      });
+
+      if (response.data.success) {
+        Alert.alert('Success', 'Your profile has been updated!');
+      } else {
+        Alert.alert('Error', 'Failed to update your profile. Please try again later.');
+      }
+    } catch (error) {
+      console.log('Error updating profile:', error);
+      Alert.alert('Error', 'An error occurred while updating your profile.');
+    }
   };
 
   const handleChangePassword = () => {
@@ -24,52 +91,33 @@ export default function Profilescreen() {
   };
 
   const handleContactSupport = () => {
-    Alert.alert('Contact Support', 'You can reach out to barkcodecompawnion@gmail.com ');
+    Alert.alert('Contact Support', 'You can reach out to barkcodecompawnion@gmail.com');
   };
 
   return (
     <View style={styles.container}>
       <TouchableOpacity style={styles.backButton} onPress={() => navigation.goBack()}>
-      <Image source={require('../assets/pcs/Backbutton.png')} style={styles.back}/>
+        <Image source={require('../assets/pcs/Backbutton.png')} style={styles.back} />
       </TouchableOpacity>
       <Text style={styles.title}>Account Settings</Text>
-      
-      <Image source={{ uri: 'https://placekitten.com/100/100' }} style={styles.profileImage} />
+
+      {/* Profile Image Section */}
+      <TouchableOpacity onPress={handleChangeImage}>
+        <Image
+          source={{ uri: profileImage || 'https://placekitten.com/100/100' }} // Default to placeholder if no profile image
+          style={styles.profileImage}
+        />
+      </TouchableOpacity>
       <Text style={styles.editImageText}>Edit Image</Text>
 
-      <TextInput
-        style={styles.input}
-        value={firstName}
-        onChangeText={setFirstName}
-        placeholder="First Name"
-      />
-      <TextInput
-        style={styles.input}
-        value={lastName}
-        onChangeText={setLastName}
-        placeholder="Last Name"
-      />
-      <TextInput
-        style={styles.input}
-        value={username}
-        onChangeText={setUsername}
-        placeholder="Username"
-      />
-      <TextInput
-        style={styles.input}
-        value={email}
-        onChangeText={setEmail}
-        placeholder="Email"
-        keyboardType="email-address"
-      />
-      <TextInput
-        style={styles.input}
-        value={phoneNumber}
-        onChangeText={setPhoneNumber}
-        placeholder="Phone Number"
-        keyboardType="phone-pad"
-      />
+      {/* Input fields for user information */}
+      <TextInput style={styles.input} value={firstName} onChangeText={setFirstName} placeholder="First Name" />
+      <TextInput style={styles.input} value={lastName} onChangeText={setLastName} placeholder="Last Name" />
+      <TextInput style={styles.input} value={username} onChangeText={setUsername} placeholder="Username" />
+      <TextInput style={styles.input} value={email} onChangeText={setEmail} placeholder="Email" keyboardType="email-address" />
+      <TextInput style={styles.input} value={phoneNumber} onChangeText={setPhoneNumber} placeholder="Phone Number" keyboardType="phone-pad" />
 
+      {/* Save and other buttons */}
       <TouchableOpacity style={styles.saveButton} onPress={handleSaveChanges}>
         <Text style={styles.buttonText}>Save Changes</Text>
       </TouchableOpacity>
@@ -80,6 +128,7 @@ export default function Profilescreen() {
         <Text style={styles.buttonText}>Log Out</Text>
       </TouchableOpacity>
 
+      {/* Contact Support Button */}
       <TouchableOpacity onPress={handleContactSupport}>
         <Text style={styles.contactSupport}>Contact Support</Text>
       </TouchableOpacity>

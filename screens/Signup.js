@@ -1,14 +1,6 @@
-import React, {useState} from 'react';
-import {
-  Text,
-  View,
-  TextInput,
-  StyleSheet,
-  TouchableOpacity,
-  Alert,
-  Image,
-} from 'react-native';
-import {useNavigation} from '@react-navigation/native';
+import React, { useState } from 'react';
+import { Text, View, TextInput, StyleSheet, TouchableOpacity, Alert, Image } from 'react-native';
+import { useNavigation } from '@react-navigation/native';
 
 export default function Signup() {
   const navigation = useNavigation();
@@ -16,69 +8,69 @@ export default function Signup() {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [confirmPassword, setConfirmPassword] = useState('');
-  const [isPasswordFocused, setIsPasswordFocused] = useState(false);
+  const [applicationID, setApplicationID] = useState('');
 
-  const validateEmail = email => {
+  const validateApplicationID = (id) => {
+    const idPattern = /^[A-Za-z0-9]+$/; // Example validation: 6-10 alphanumeric characters
+    return idPattern.test(id);
+  };
+
+  const validateEmail = (email) => {
     const emailPattern = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
     return emailPattern.test(email);
   };
 
   const handleSignupPress = async () => {
-    if (!username || !email || !password || !confirmPassword) {
-      Alert.alert('Error', 'Please fill out all fields.');
+    if (!username || !email || !password || !confirmPassword || !applicationID) {
+      Alert.alert("Error", "Please fill out all fields.");
+      return;
+    }
+
+    if (!validateApplicationID(applicationID)) {
+      Alert.alert("Error", "Please enter a valid Application ID.");
       return;
     }
 
     if (!validateEmail(email)) {
-      Alert.alert('Error', 'Please enter a valid email address.');
+      Alert.alert("Error", "Please enter a valid email address.");
       return;
     }
 
     if (password.length < 8) {
-      Alert.alert('Error', 'Password must be at least 8 characters long.');
+      Alert.alert("Error", "Password must be at least 8 characters long.");
       return;
     }
 
     if (password !== confirmPassword) {
-      Alert.alert('Error', 'Passwords do not match.');
+      Alert.alert("Error", "Passwords do not match.");
       return;
     }
 
     try {
-      const response = await fetch(
-        'https://compawnion-backend.onrender.com/compawnions/register',
-        {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json',
-          },
-          body: JSON.stringify({
-            accountCreate: {
-              Username: username,
-              Email: email,
-              Password: password,
-            },
-          }),
+      const response = await fetch('https://compawnion-backend.onrender.com/Compawnions/register', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
         },
-      );
+        body: JSON.stringify({
+          accountCreate: {
+            Name: username,
+            Username: username,
+            Email: email,
+            Password: password,
+          },
+          appPetID: applicationID, // Send applicationID (appPetID) in the body
+        }),
+      });
 
-      let data;
-      try {
-        data = await response.json();
-      } catch (parseError) {
-        console.error('Error parsing response:', parseError);
-        throw new Error('Unexpected server response.');
-      }
+      const data = await response.json();
 
       if (response.ok) {
         Alert.alert('Success', 'Account created successfully!');
-        navigation.navigate('Plscheck'); // Navigate to the next screen
+        navigation.navigate('Plscheck'); // Navigate to another screen
       } else {
         console.log('Server Response:', data);
-        Alert.alert(
-          'Signup Failed',
-          data.message || 'An error occurred during registration.',
-        );
+        Alert.alert('Signup Failed', data.message || 'An error occurred during registration.');
       }
     } catch (error) {
       console.error('Fetch error:', error);
@@ -94,13 +86,20 @@ export default function Signup() {
     <View style={styles.container}>
       <View style={styles.header}>
         <TouchableOpacity onPress={handlePressLogin}>
-          <Image
-            source={require('../assets/pcs/Backbutton.png')}
-            style={styles.back}
-          />
+          <Image source={require('../assets/pcs/Backbutton.png')} style={styles.back} />
         </TouchableOpacity>
         <Text style={styles.title}>Sign Up</Text>
       </View>
+
+      <Text style={styles.label}>Application ID</Text>
+      <TextInput
+        style={styles.input}
+        placeholder="Enter your Application ID"
+        placeholderTextColor="#888"
+        onChangeText={setApplicationID}
+        value={applicationID}
+        autoCapitalize="none"
+      />
 
       <Text style={styles.label}>Username</Text>
       <TextInput
@@ -131,15 +130,7 @@ export default function Signup() {
         onChangeText={setPassword}
         value={password}
         secureTextEntry
-        onFocus={() => setIsPasswordFocused(true)}
-        onBlur={() => setIsPasswordFocused(false)}
       />
-      {isPasswordFocused && (
-        <Text style={styles.passwordRequirement}>
-          Must be 8 characters long with a combination of letters, numbers, and
-          symbols.
-        </Text>
-      )}
 
       <Text style={styles.label}>Confirm Password</Text>
       <TextInput
@@ -162,6 +153,7 @@ export default function Signup() {
     </View>
   );
 }
+
 
 const styles = StyleSheet.create({
   container: {
