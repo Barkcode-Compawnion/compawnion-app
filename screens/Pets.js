@@ -110,7 +110,108 @@ const styles = StyleSheet.create({
         color: '#C35E26',
         marginRight: 10,
     },
+    back: {
+        width: 70,
+        height: 30,
+        resizeMode: 'contain',
+    },
+      backButton: {
+        position: 'absolute',
+        top: 40,
+        left: 10,
+    },
+    petImage: {
+        width: 250,
+        height: 250,
+        borderRadius: 30,
+        top:-10,
+    },
+    petName: {
+        fontSize: 40,
+        fontWeight: 'bold',
+        color: '#C35E26',
+        top:-50,
+        right:80,
+    },
     petBreed: {
+        fontSize: 20,
+        color: '#45362F',
+        top: -50,
+        right: 60,
+    },
+    //AGE and weight container//
+    agecontainer:{
+        backgroundColor: '#C35E26',
+        borderRadius: 20,
+        width: 300,
+        height: 100,
+        top:40,
+        justifyContent: 'space-between',
+        flexDirection: 'row',
+        paddingVertical: 10,
+        paddingHorizontal: 15,
+        alignSelf: 'center',
+    },
+    infoBox: {
+        flex: 1,
+        alignItems: 'center',
+    },
+    divider: {
+        width: 1,
+        height: '60%',
+        backgroundColor: '#FFFFFF',
+        marginHorizontal: 10,
+    },
+    ages:{
+        fontSize: 20,
+        color:'#fff',
+        fontWeight: 'bold',
+    },
+    petage: {
+        fontSize: 18,
+        color: '#fff',
+    },
+    petweight: {
+        fontSize: 18,
+        color: '#fff',
+    },
+    petsize: {
+        fontSize: 18,
+        color: '#45362F',
+    },
+    pettype: {
+        fontSize: 18,
+        color: '#45362F',
+    },
+    petAdoptDate: {
+        fontSize: 18,
+        color: '#45362F',
+    },
+    petStatus: {
+        fontSize: 18,
+        color: '#45362F',
+    },
+    petBgstory: {
+        fontSize: 18,
+        color: '#45362F',
+    },
+    petmedDate: {
+        fontSize: 18,
+        color: '#45362F',
+    },
+    petrescDate: {
+        fontSize: 18,
+        color: '#45362F',
+    },
+    petvacDate: {
+        fontSize: 18,
+        color: '#45362F',
+    },
+    petvacExp: {
+        fontSize: 18,
+        color: '#45362F',
+    },
+    petpetID: {
         fontSize: 18,
         color: '#45362F',
         marginBottom: 10,
