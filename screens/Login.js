@@ -1,7 +1,9 @@
 import React, { useState } from 'react';
-import { Text, View, Image, StyleSheet, TouchableOpacity, TextInput, Alert } from 'react-native';
+import { Text, View, Image, StyleSheet, TouchableOpacity, TextInput, Alert, Dimensions, Platform } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
+
+const { width, height } = Dimensions.get('window');
 
 export default function Login() {
   const navigation = useNavigation();
@@ -9,25 +11,15 @@ export default function Login() {
   const [password, setPassword] = useState('');
   const [loading, setLoading] = useState(false);
 
-  // Navigate to Forgot Password screen
-  const handlePressForgot = () => {
-    navigation.navigate('Forgotpass');
-  };
+  const handlePressForgot = () => navigation.navigate('Forgotpass');
+  const handlePressSignup = () => navigation.navigate('Signup');
 
-  // Navigate to Signup screen
-  const handlePressSignup = () => {
-    navigation.navigate('Signup');
-  };
-
-  // Login button handler
   const handleLoginPress = async () => {
     if (!username || !password) {
       Alert.alert('Error', 'Please enter both username and password');
       return;
     }
-
     setLoading(true);
-
     try {
       const response = await fetch('https://compawnion-backend.onrender.com/Compawnions/login', {
         method: 'POST',
@@ -38,12 +30,11 @@ export default function Login() {
       });
 
       const data = await response.json();
-
       if (response.ok) {
-        await AsyncStorage.setItem('authToken', data.token); // Store token
-        await AsyncStorage.setItem('username', username); // Store username
+        await AsyncStorage.setItem('authToken', data.token);
+        await AsyncStorage.setItem('username', username);
         Alert.alert('Success', 'Login successful!');
-        navigation.navigate('Homepage', { username }); // Pass username as a param
+        navigation.navigate('Homepage', { username });
       } else {
         Alert.alert('Login Failed', data.message || 'Invalid username or password');
       }
@@ -57,6 +48,7 @@ export default function Login() {
 
   return (
     <View style={styles.container}>
+      <Image source={require('../assets/pcs/Logo.png')} style={styles.image} />
       <Text style={styles.title}>Log in</Text>
       <TextInput
         style={styles.username}
@@ -75,16 +67,11 @@ export default function Login() {
         value={password}
         secureTextEntry
       />
-      <TouchableOpacity
-        style={styles.button}
-        onPress={handleLoginPress}
-        disabled={loading} // Disable button when loading
-      >
+      <TouchableOpacity style={styles.button} onPress={handleLoginPress} disabled={loading}>
         <Text style={styles.buttonText}>
           {loading ? 'Logging in...' : 'Log in'}
         </Text>
       </TouchableOpacity>
-      <Image source={require('../assets/pcs/Logo.png')} style={styles.image} />
       <TouchableOpacity onPress={handlePressForgot}>
         <Text style={styles.forgotpass}>Forgot Password</Text>
       </TouchableOpacity>
@@ -100,81 +87,78 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     justifyContent: 'center',
-    padding: 20,
+    alignItems: 'center',
+    padding: width * 0.05,
     backgroundColor: '#E9E9E9',
   },
   title: {
-    fontSize: 40,
+    fontSize: width * 0.1, // Responsive font size
     fontWeight: 'bold',
     textAlign: 'center',
     color: '#C35E26',
+    marginBottom: height * 0.03,
   },
   username: {
-    height: 50,
+    height: height * 0.06,
     width: '80%',
     borderColor: '#ddd',
     borderWidth: 1,
     borderRadius: 30,
     paddingHorizontal: 15,
-    marginTop: 100,
-    alignSelf: 'center',
-    fontSize: 16,
+    marginTop: height * 0.05,
+    fontSize: width * 0.04,
     backgroundColor: '#fff',
   },
   password: {
-    height: 50,
+    height: height * 0.06,
     width: '80%',
     borderColor: '#ddd',
     borderWidth: 1,
     borderRadius: 30,
     paddingHorizontal: 15,
-    marginTop: 20,
-    alignSelf: 'center',
-    fontSize: 16,
+    marginTop: height * 0.02,
+    fontSize: width * 0.04,
     backgroundColor: '#fff',
   },
   button: {
-    height: 50,
+    height: height * 0.06,
     width: '80%',
     backgroundColor: '#C35E26',
     borderRadius: 30,
     justifyContent: 'center',
     alignItems: 'center',
-    marginTop: 20,
-    alignSelf: 'center',
+    marginTop: height * 0.03,
   },
   buttonText: {
     color: '#fff',
-    fontSize: 18,
+    fontSize: width * 0.05,
   },
   image: {
-    width: 140,
-    height: 50,
-    position: 'absolute',
-    top: 70,
-    left: 128,
-    zIndex: 0,
+    width: width * 0.4,
+    height: height * 0.07,
+    resizeMode: 'contain',
+    marginTop: height * 0.05,
   },
   forgotpass: {
-    fontSize: 12,
+    fontSize: width * 0.035,
     color: '#45362F',
     fontWeight: 'bold',
     textDecorationLine: 'underline',
-    alignSelf: 'center',
-    marginTop: 20,
+    marginTop: height * 0.02,
   },
   haveacc: {
-    fontSize: 13,
+    fontSize: width * 0.04,
     fontWeight: 'bold',
     textAlign: 'center',
-    marginTop: 40,
+    marginTop: height * 0.04,
     color: '#45362F',
   },
   signup: {
-    fontSize: 14,
+    fontSize: width * 0.045,
     color: '#C35E26',
     fontWeight: 'bold',
     textDecorationLine: 'underline',
-    alignSelf: 'center',
+    marginTop: height * 0.01,
   },
 });
+

@@ -1,40 +1,49 @@
 import React from 'react';
-import { View, Text, Image, StyleSheet, TouchableOpacity, ScrollView } from 'react-native';
+import { View, Text, Image, StyleSheet, TouchableOpacity, ScrollView, useWindowDimensions } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
 
 export default function Pets({ route }) {
     const { pet } = route.params;
     const navigation = useNavigation();
+    const { width, height } = useWindowDimensions();
 
-    const handleCompawns = () => { navigation.navigate('Compawnionsched');};
+    const handleCompawns = () => { navigation.navigate('Compawnionsched'); };
     const handleMedical = () => { navigation.navigate('Medicalsched'); };
+    const handlereadmore = () => { };
 
-    const handlereadmore = () => {
-      };
+    // Dynamic margin to shift elements down based on screen height
+    const dynamicTopMargin = height * 0.1;
 
     return (
-        <ScrollView style={styles.container}>
+        <ScrollView
+            vertical
+            showsVerticalScrollIndicator={false}
+            contentContainerStyle={[styles.container, { minHeight: height * 1.2 }]}
+        >
             {/* Back Button */}
             <TouchableOpacity style={styles.backButton} onPress={() => navigation.goBack()}>
                 <Image source={require('../assets/pcs/Backbutton.png')} style={styles.back} />
             </TouchableOpacity>
 
             {/* Pet Name, Breed, and Gender */}
-            <View style={styles.header}>
-                <View style={{ flexDirection: 'row', alignItems: 'center' }}>
-                    <Text style={styles.petName}>{pet.personal.name}</Text>
-                </View>
-                <Text style={styles.petBreed}>{pet.personal.breed}</Text>
+            <View style={{ flexDirection: 'row', alignItems: 'center' }}>
+                <Text style={[styles.petName, { fontSize: width * 0.08 }]}>{pet.personal.name}</Text>
             </View>
+            <Text style={[styles.petBreed, { fontSize: width * 0.05 }]}>{pet.personal.breed}</Text>
 
             {/* Pet Image */}
-            <Image source={{ uri: pet.personal.picture }} style={styles.petImage} />
+            <Image
+                source={{ uri: pet.personal.picture }}
+                style={[styles.petImage, { width: width * 0.9, height: height * 0.3, marginTop: dynamicTopMargin }]}
+            />
 
             {/* Personality */}
-            <Text style={styles.petPersonality}>{pet.background.personality}</Text>
+            <Text style={[styles.petPersonality, { marginTop: dynamicTopMargin }]}>
+                {pet.background.personality}
+            </Text>
 
             {/* Age and Weight Section */}
-            <View style={styles.infoContainer}>
+            <View style={[styles.infoContainer, { marginTop: dynamicTopMargin }]}>
                 <View style={styles.infoBox}>
                     <Text style={styles.infoLabel}>Age</Text>
                     <Text style={styles.infoText}>
@@ -49,7 +58,7 @@ export default function Pets({ route }) {
             </View>
 
             {/* Rescue and Adoption Dates */}
-            <View style={styles.datesContainer}>
+            <View style={[styles.datesContainer, { marginTop: dynamicTopMargin }]}>
                 <View style={styles.dateBox}>
                     <Text style={styles.dateLabel}>Rescue Date</Text>
                     <Text style={styles.dateText}>{pet.background.rescueDate}</Text>
@@ -61,16 +70,16 @@ export default function Pets({ route }) {
             </View>
 
             {/* Rescue Story */}
-            <Text style={styles.storyTitle}>Rescue Story</Text>
-            <Text style={styles.storyText}>
-                {pet.background.backgroundStory} 
+            <Text style={[styles.storyTitle, { marginTop: dynamicTopMargin }]}>Rescue Story</Text>
+            <Text style={[styles.storyText, { marginBottom: dynamicTopMargin }]}>
+                {pet.background.backgroundStory}
                 <TouchableOpacity onPress={handlereadmore}>
-                <Text style={styles.readMore}>Read More</Text>
+                    <Text style={styles.readMore}>Read More</Text>
                 </TouchableOpacity>
             </Text>
 
             {/* Action Buttons */}
-            <View style={styles.footer}>
+            <View style={[styles.footer, { width: width * 0.8, marginTop: dynamicTopMargin }]}>
                 <TouchableOpacity style={styles.footerButton} onPress={handleMedical}>
                     <Image source={require('../assets/pcs/Medical.png')} style={styles.icon} />
                 </TouchableOpacity>
@@ -84,9 +93,10 @@ export default function Pets({ route }) {
 
 const styles = StyleSheet.create({
     container: {
-        flex: 1,
+        padding: 20,
         backgroundColor: '#E9E9E9',
-        paddingHorizontal: 20,
+        alignItems: 'center',
+        justifyContent: 'flex-start',
     },
     backButton: {
         position: 'absolute',
@@ -98,147 +108,35 @@ const styles = StyleSheet.create({
         width: 30,
         height: 30,
         resizeMode: 'contain',
-    },
-    header: {
-        marginTop: 80,
-        marginBottom: 10,
-        alignItems: 'center',
-    },
-    petName: {
-        fontSize: 32,
-        fontWeight: 'bold',
-        color: '#C35E26',
-        marginRight: 10,
-    },
-    back: {
-        width: 70,
-        height: 30,
-        resizeMode: 'contain',
-    },
-      backButton: {
-        position: 'absolute',
         top: 40,
-        left: 10,
-    },
-    petImage: {
-        width: 250,
-        height: 250,
-        borderRadius: 30,
-        top:-10,
+        left: 20,
     },
     petName: {
-        fontSize: 40,
         fontWeight: 'bold',
         color: '#C35E26',
-        top:-50,
-        right:80,
+        top:50,
     },
     petBreed: {
-        fontSize: 20,
         color: '#45362F',
-        top: -50,
-        right: 60,
-    },
-    //AGE and weight container//
-    agecontainer:{
-        backgroundColor: '#C35E26',
-        borderRadius: 20,
-        width: 300,
-        height: 100,
-        top:40,
-        justifyContent: 'space-between',
-        flexDirection: 'row',
-        paddingVertical: 10,
-        paddingHorizontal: 15,
-        alignSelf: 'center',
-    },
-    infoBox: {
-        flex: 1,
-        alignItems: 'center',
-    },
-    divider: {
-        width: 1,
-        height: '60%',
-        backgroundColor: '#FFFFFF',
-        marginHorizontal: 10,
-    },
-    ages:{
-        fontSize: 20,
-        color:'#fff',
-        fontWeight: 'bold',
-    },
-    petage: {
-        fontSize: 18,
-        color: '#fff',
-    },
-    petweight: {
-        fontSize: 18,
-        color: '#fff',
-    },
-    petsize: {
-        fontSize: 18,
-        color: '#45362F',
-    },
-    pettype: {
-        fontSize: 18,
-        color: '#45362F',
-    },
-    petAdoptDate: {
-        fontSize: 18,
-        color: '#45362F',
-    },
-    petStatus: {
-        fontSize: 18,
-        color: '#45362F',
-    },
-    petBgstory: {
-        fontSize: 18,
-        color: '#45362F',
-    },
-    petmedDate: {
-        fontSize: 18,
-        color: '#45362F',
-    },
-    petrescDate: {
-        fontSize: 18,
-        color: '#45362F',
-    },
-    petvacDate: {
-        fontSize: 18,
-        color: '#45362F',
-    },
-    petvacExp: {
-        fontSize: 18,
-        color: '#45362F',
-    },
-    petpetID: {
-        fontSize: 18,
-        color: '#45362F',
-        marginBottom: 10,
-    },
-    genderIcon: {
-        width: 24,
-        height: 24,
-        resizeMode: 'contain',
+        top:60,
     },
     petImage: {
-        width: '100%',
-        height: 250,
         borderRadius: 20,
-        marginVertical: 10,
+        marginVertical: 20,
+        top:30,
     },
     petPersonality: {
         fontSize: 18,
         color: '#45362F',
         textAlign: 'center',
-        marginVertical: 10,
+        top:40,
     },
     infoContainer: {
         flexDirection: 'row',
         backgroundColor: '#C35E26',
         borderRadius: 15,
         padding: 15,
-        marginVertical: 20,
+        top: -30,
     },
     infoBox: {
         flex: 1,
@@ -262,7 +160,7 @@ const styles = StyleSheet.create({
     datesContainer: {
         flexDirection: 'row',
         justifyContent: 'space-between',
-        marginVertical: 20,
+        top: -60,
     },
     dateBox: {
         backgroundColor: '#45362F',
@@ -284,41 +182,31 @@ const styles = StyleSheet.create({
         fontSize: 18,
         fontWeight: 'bold',
         color: '#C35E26',
-        marginTop: 10,
+        top: -40,
     },
     storyText: {
         fontSize: 16,
         color: '#45362F',
-        marginBottom: 20,
+        top: -40,
     },
     readMore: {
         color: '#C35E26',
         fontWeight: 'bold',
     },
-    actionButtons: {
-        flexDirection: 'row',
-        justifyContent: 'space-around',
-        marginVertical: 20,
-    },
     footer: {
         flexDirection: 'row',
-        justifyContent: 'space-evenly',
+        justifyContent: 'center',
         alignItems: 'center',
-        position: 'absolute',
-        bottom: -80,
-        paddingVertical: 10,
-        paddingHorizontal: 20,
-        borderRadius: 30,
+        paddingHorizontal: 10,
         backgroundColor: '#C35E26',
-        alignSelf: 'center',
-        width: '90%',
-      },
-      footerButton: {
+        borderRadius: 30,
+    },
+    footerButton: {
         alignItems: 'center',
-        padding: 10,
-      },
-      icon: {
+        marginHorizontal: 20,
+    },
+    icon: {
         width: 70,
         height: 30,
-      },
+    },
 });

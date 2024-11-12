@@ -1,9 +1,12 @@
-import React, { useState } from 'react';
-import { View, Text, TextInput, StyleSheet, TouchableOpacity, Image, Alert } from 'react-native';
+import React, { useState, useEffect } from 'react';
+import { View, Text, TextInput, StyleSheet, TouchableOpacity, Image, Alert, ScrollView, Dimensions } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
 import { launchImageLibrary } from 'react-native-image-picker'; // Import Image Picker
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import axios from 'axios'; // Assuming you are using axios for HTTP requests
+
+// Get screen dimensions for responsive design
+const { width, height } = Dimensions.get('window');
 
 export default function Profilescreen({ route }) {
   const navigation = useNavigation();
@@ -13,6 +16,10 @@ export default function Profilescreen({ route }) {
   const [email, setEmail] = useState('');
   const [phoneNumber, setPhoneNumber] = useState('');
   const [profileImage, setProfileImage] = useState(route?.params?.profileImage || ''); // Default to current profile picture
+
+  useEffect(() => {
+    loadProfileImage();
+  }, []);
 
   const loadProfileImage = async () => {
     const savedProfileImage = await AsyncStorage.getItem('profileImage');
@@ -40,8 +47,12 @@ export default function Profilescreen({ route }) {
 
   // Save changes including profile image to backend
   const handleSaveChanges = async () => {
+    if (!firstName || !lastName || !username || !email || !phoneNumber) {
+      Alert.alert('Validation Error', 'All fields are required.');
+      return;
+    }
+
     try {
-      // Create form data to send to backend
       const formData = new FormData();
       formData.append('firstName', firstName);
       formData.append('lastName', lastName);
@@ -54,26 +65,25 @@ export default function Profilescreen({ route }) {
         const imageName = imageUri.split('/').pop();
         const imageType = imageUri.match(/\.(\w+)$/)[1];
         
-        // Convert the image to a format that can be uploaded
         const image = {
           uri: imageUri,
           type: `image/${imageType}`,
           name: imageName,
         };
         
-        formData.append('profileImage', image); // Append the image to form data
+        formData.append('profileImage', image);
       }
 
       const response = await axios.post('https://your-backend-url.com/updateProfile', formData, {
         headers: {
-          'Content-Type': 'multipart/form-data', // Required for sending files
+          'Content-Type': 'multipart/form-data',
         },
       });
 
       if (response.data.success) {
         Alert.alert('Success', 'Your profile has been updated!');
       } else {
-        Alert.alert('Error', 'Failed to update your profile. Please try again later.');
+        Alert.alert('Error', 'Failed to update your profile.');
       }
     } catch (error) {
       console.log('Error updating profile:', error);
@@ -95,7 +105,7 @@ export default function Profilescreen({ route }) {
   };
 
   return (
-    <View style={styles.container}>
+    <ScrollView vertical showsVerticalScrollIndicator={false} contentContainerStyle={styles.container}>
       <TouchableOpacity style={styles.backButton} onPress={() => navigation.goBack()}>
         <Image source={require('../assets/pcs/Backbutton.png')} style={styles.back} />
       </TouchableOpacity>
@@ -105,17 +115,44 @@ export default function Profilescreen({ route }) {
       <TouchableOpacity onPress={handleChangeImage}>
         <Image
           source={{ uri: profileImage || 'https://placekitten.com/100/100' }} // Default to placeholder if no profile image
-          style={styles.profileImage}
+          style={[styles.profileImage, { width: width * 0.25, height: width * 0.25 }]} // Dynamic size based on screen width
         />
       </TouchableOpacity>
       <Text style={styles.editImageText}>Edit Image</Text>
 
       {/* Input fields for user information */}
-      <TextInput style={styles.input} value={firstName} onChangeText={setFirstName} placeholder="First Name" />
-      <TextInput style={styles.input} value={lastName} onChangeText={setLastName} placeholder="Last Name" />
-      <TextInput style={styles.input} value={username} onChangeText={setUsername} placeholder="Username" />
-      <TextInput style={styles.input} value={email} onChangeText={setEmail} placeholder="Email" keyboardType="email-address" />
-      <TextInput style={styles.input} value={phoneNumber} onChangeText={setPhoneNumber} placeholder="Phone Number" keyboardType="phone-pad" />
+      <TextInput
+        style={[styles.input, { width: width * 0.8 }]} 
+        value={firstName}
+        onChangeText={setFirstName}
+        placeholder="First Name"
+      />
+      <TextInput
+        style={[styles.input, { width: width * 0.8 }]}
+        value={lastName}
+        onChangeText={setLastName}
+        placeholder="Last Name"
+      />
+      <TextInput
+        style={[styles.input, { width: width * 0.8 }]}
+        value={username}
+        onChangeText={setUsername}
+        placeholder="Username"
+      />
+      <TextInput
+        style={[styles.input, { width: width * 0.8 }]}
+        value={email}
+        onChangeText={setEmail}
+        placeholder="Email"
+        keyboardType="email-address"
+      />
+      <TextInput
+        style={[styles.input, { width: width * 0.8 }]}
+        value={phoneNumber}
+        onChangeText={setPhoneNumber}
+        placeholder="Phone Number"
+        keyboardType="phone-pad"
+      />
 
       {/* Save and other buttons */}
       <TouchableOpacity style={styles.saveButton} onPress={handleSaveChanges}>
@@ -132,16 +169,16 @@ export default function Profilescreen({ route }) {
       <TouchableOpacity onPress={handleContactSupport}>
         <Text style={styles.contactSupport}>Contact Support</Text>
       </TouchableOpacity>
-    </View>
+    </ScrollView>
   );
 }
 
 const styles = StyleSheet.create({
   container: {
-    flex: 1,
     padding: 20,
     backgroundColor: '#E9E9E9',
     alignItems: 'center',
+    justifyContent: 'flex-start',
   },
   back: {
     width: 70,
@@ -160,25 +197,22 @@ const styles = StyleSheet.create({
     marginTop: 20,
   },
   profileImage: {
-    width: 100,
-    height: 100,
     borderRadius: 50,
     marginTop: 20,
   },
   editImageText: {
     color: '#C35E26',
     fontSize: 14,
-    marginTop: 10,
+    top: height*-0.01,
     textDecorationLine: 'underline',
   },
   input: {
     height: 45,
-    width: '90%',
     borderColor: '#ddd',
     borderWidth: 1,
     borderRadius: 20,
     paddingHorizontal: 15,
-    marginTop: 10,
+    marginTop:10,
     backgroundColor: '#fff',
     fontSize: 16,
   },

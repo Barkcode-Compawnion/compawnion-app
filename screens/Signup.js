@@ -1,6 +1,12 @@
 import React, { useState } from 'react';
-import { Text, View, TextInput, StyleSheet, TouchableOpacity, Alert, Image } from 'react-native';
+import { Text, View, TextInput, StyleSheet, TouchableOpacity, Alert, Image, Dimensions } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
+
+const { width, height } = Dimensions.get('window');
+
+// Scaling function based on screen width
+const scaleWidth = (size) => (width / 375) * size;
+const scaleHeight = (size) => (height / 812) * size;
 
 export default function Signup() {
   const navigation = useNavigation();
@@ -10,15 +16,8 @@ export default function Signup() {
   const [confirmPassword, setConfirmPassword] = useState('');
   const [applicationID, setApplicationID] = useState('');
 
-  const validateApplicationID = (id) => {
-    const idPattern = /^[A-Za-z0-9]+$/; // Example validation: 6-10 alphanumeric characters
-    return idPattern.test(id);
-  };
-
-  const validateEmail = (email) => {
-    const emailPattern = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-    return emailPattern.test(email);
-  };
+  const validateApplicationID = (id) => /^[A-Za-z0-9]+$/.test(id);
+  const validateEmail = (email) => /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
 
   const handleSignupPress = async () => {
     if (!username || !email || !password || !confirmPassword || !applicationID) {
@@ -49,17 +48,10 @@ export default function Signup() {
     try {
       const response = await fetch('https://compawnion-backend.onrender.com/Compawnions/register', {
         method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
+        headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
-          accountCreate: {
-            Name: username,
-            Username: username,
-            Email: email,
-            Password: password,
-          },
-          appPetID: applicationID, // Send applicationID (appPetID) in the body
+          accountCreate: { Name: username, Username: username, Email: email, Password: password },
+          appPetID: applicationID,
         }),
       });
 
@@ -67,7 +59,7 @@ export default function Signup() {
 
       if (response.ok) {
         Alert.alert('Success', 'Account created successfully!');
-        navigation.navigate('Plscheck'); // Navigate to another screen
+        navigation.navigate('Plscheck');
       } else {
         console.log('Server Response:', data);
         Alert.alert('Signup Failed', data.message || 'An error occurred during registration.');
@@ -78,9 +70,7 @@ export default function Signup() {
     }
   };
 
-  const handlePressLogin = () => {
-    navigation.goBack();
-  };
+  const handlePressLogin = () => navigation.goBack();
 
   return (
     <View style={styles.container}>
@@ -154,83 +144,74 @@ export default function Signup() {
   );
 }
 
-
 const styles = StyleSheet.create({
   container: {
     flex: 1,
     justifyContent: 'flex-start',
-    padding: 20,
+    padding: scaleWidth(20),
     backgroundColor: '#E9E9E9',
   },
   header: {
     flexDirection: 'row',
     alignItems: 'center',
-    marginTop: 40,
+    marginTop: scaleHeight(40),
   },
   back: {
-    width: 70,
-    height: 30,
+    width: scaleWidth(70),
+    height: scaleHeight(30),
     resizeMode: 'contain',
   },
   title: {
-    fontSize: 32,
+    fontSize: scaleWidth(32),
     fontWeight: 'bold',
     color: '#C35E26',
   },
   label: {
-    fontSize: 16,
+    fontSize: scaleWidth(16),
     fontWeight: 'bold',
     color: '#333',
     marginLeft: '5%',
-    marginTop: 20,
+    marginTop: scaleHeight(20),
   },
   input: {
-    height: 50,
+    height: scaleHeight(50),
     width: '90%',
     borderColor: '#ddd',
     borderWidth: 1,
     borderRadius: 30,
     paddingHorizontal: 15,
-    marginTop: 5,
-    fontSize: 16,
+    marginTop: scaleHeight(5),
+    fontSize: scaleWidth(16),
     backgroundColor: '#fff',
     alignSelf: 'center',
   },
-  passwordRequirement: {
-    color: '#888',
-    fontSize: 12,
-    marginTop: 5,
-    width: '90%',
-    alignSelf: 'center',
-    textAlign: 'left',
-  },
   button: {
-    height: 40,
-    width: 250,
+    height: scaleHeight(40),
+    width: scaleWidth(250),
     backgroundColor: '#C35E26',
     borderRadius: 20,
     justifyContent: 'center',
     alignItems: 'center',
-    marginTop: 20,
+    marginTop: scaleHeight(20),
     alignSelf: 'center',
   },
   buttonText: {
     color: '#fff',
-    fontSize: 18,
+    fontSize: scaleWidth(18),
   },
   haveAcc: {
-    fontSize: 13,
+    fontSize: scaleWidth(13),
     fontWeight: 'bold',
     textAlign: 'center',
-    marginTop: 30,
+    marginTop: scaleHeight(30),
     color: '#45362F',
   },
   login: {
-    fontSize: 14,
+    fontSize: scaleWidth(14),
     color: '#C35E26',
     fontWeight: 'bold',
     textDecorationLine: 'underline',
     textAlign: 'center',
-    marginTop: 5,
+    marginTop: scaleHeight(5),
   },
 });

@@ -1,23 +1,27 @@
 import React, { useState } from 'react';
-import { Text, View, TextInput, StyleSheet, TouchableOpacity, Alert } from 'react-native';
+import { Text, View, TextInput, StyleSheet, TouchableOpacity, Alert, Dimensions } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
+
+const { width, height } = Dimensions.get('window');
+
+// Scaling functions for responsiveness
+const scaleWidth = (size) => (width / 375) * size;
+const scaleHeight = (size) => (height / 812) * size;
 
 export default function ForgotPass() {
     const navigation = useNavigation();
     const [email, setEmail] = useState('');
 
     const handlereset = async () => {
-        if (!email) { 
+        if (!email) {
             Alert.alert("Validation Error", "Please enter an email address.");
             return;
         }
 
         try {
-            const response = await fetch('https://compawnion-backend.onrender.com/reset-password', {  // Adjust endpoint if needed
+            const response = await fetch('https://compawnion-backend.onrender.com/reset-password', {
                 method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                },
+                headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({ email }),
             });
 
@@ -25,7 +29,7 @@ export default function ForgotPass() {
 
             if (response.ok) {
                 Alert.alert("Success", "Please check your email for password reset instructions.");
-                navigation.navigate('Resetpass');  // Navigate to Resetpass screen if successful
+                navigation.navigate('Resetpass');
             } else {
                 Alert.alert("Error", data.message || "An error occurred. Please try again.");
             }
@@ -42,9 +46,10 @@ export default function ForgotPass() {
     return (
         <View style={styles.container}>
             <Text style={styles.Reset}>Reset{"\n"}Password</Text>
-            <TextInput 
+
+            <TextInput
                 style={styles.email}
-                placeholder="Email"
+                placeholder="Enter your email"
                 placeholderTextColor="#888"
                 onChangeText={(text) => setEmail(text)}
                 value={email}
@@ -67,74 +72,59 @@ export default function ForgotPass() {
 const styles = StyleSheet.create({
     container: {
         flex: 1,
-        justifyContent: 'flex-start',
-        padding: 20,
+        justifyContent: 'center',
+        alignItems: 'center',
+        padding: scaleWidth(20),
         backgroundColor: '#E9E9E9',
     },
     Reset: {
-        fontSize: 30,
+        fontSize: scaleWidth(32),
         fontWeight: 'bold',
         textAlign: 'center',
-        marginTop: 120,
-        marginLeft:137,
         color: '#45362F',
-        position:'absolute',
-        zIndex:0,
-    },
-    eaddress: {
-        fontSize: 20,
-        fontWeight: 'bold',
-        textAlign: 'center',
-        marginTop: 250,
-        marginLeft:60,
-        color: '#45362F',
-        position:'absolute',
-        zIndex:0,
+        marginBottom: scaleHeight(30),
     },
     email: {
-        height: 50,
-        width:300,
+        height: scaleHeight(50),
+        width: '90%',
         borderColor: '#ddd',
         borderWidth: 1,
         borderRadius: 30,
         paddingHorizontal: 15,
-        marginTop: 280,
-        marginLeft:50,
-        fontSize: 16,
+        marginBottom: scaleHeight(20),
+        fontSize: scaleWidth(16),
         backgroundColor: '#fff',
-        position:'absolute',
-        zIndex:1,
+    },
+    eaddress: {
+        fontSize: scaleWidth(16),
+        fontWeight: 'bold',
+        textAlign: 'center',
+        color: '#45362F',
+        marginBottom: scaleHeight(20),
     },
     buttonreset: {
-        height: 40,
-        width:200,
+        height: scaleHeight(45),
+        width: scaleWidth(250),
         backgroundColor: '#C35E26',
         borderRadius: 30,
         justifyContent: 'center',
         alignItems: 'center',
-        zIndex:1,
-        position:'absolute',
-        marginTop: 400,
-        marginLeft:100,
+        marginBottom: scaleHeight(20),
     },
     resetpass: {
         color: '#fff',
-        fontSize: 18,
+        fontSize: scaleWidth(18),
     },
     buttonback: {
-        height: 40,
-        width:200,
+        height: scaleHeight(45),
+        width: scaleWidth(250),
         backgroundColor: '#45362F',
         borderRadius: 30,
         justifyContent: 'center',
         alignItems: 'center',
-        zIndex:1,
-        position:'absolute',
-        marginTop: 460,
-        marginLeft:100,
     },
     backto: {
         color: '#fff',
-        fontSize: 18,
+        fontSize: scaleWidth(18),
     },
 });

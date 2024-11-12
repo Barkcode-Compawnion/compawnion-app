@@ -1,7 +1,7 @@
 import React from 'react';
-import { Text, View, StyleSheet, TouchableOpacity,Image, PixelRatio } from 'react-native';
+import { Text, View, StyleSheet, TouchableOpacity, Image, Dimensions } from 'react-native';
 
-const scale = PixelRatio.get();
+const { width, height } = Dimensions.get('window');
 
 export default function Startapp({ navigation }) {
   const handleButtonPress = () => {
@@ -10,13 +10,20 @@ export default function Startapp({ navigation }) {
 
   return (
     <View style={styles.container}>
-      <Text style={[styles.text, { fontFamily: 'Poppins-Regular' }]}>
+      {/* Main Heading */}
+      <Text style={styles.text}>
         Love{"\n"}Beyond{"\n"}<Text style={styles.rescuetext}>Rescue</Text>.
       </Text>
+
+      {/* Dog Image */}
+      <Image source={require('../assets/pcs/Duge.png')} style={styles.image} />
+
+      {/* Button */}
       <TouchableOpacity style={styles.button} onPress={handleButtonPress} activeOpacity={0.7}>
         <Text style={styles.buttonText}>Let's go!</Text>
       </TouchableOpacity>
-      <Image source={require('../assets/pcs/Duge.png')} style={styles.image} />
+
+      {/* Subtext */}
       <Text style={styles.salita}>Be a Compawnion.</Text>
     </View>
   );
@@ -24,60 +31,45 @@ export default function Startapp({ navigation }) {
 
 const styles = StyleSheet.create({
   container: {
-    position: 'absolute',
     flex: 1,
     backgroundColor: '#E9E9E9',
-    justifyContent: 'flex-start',
-    alignItems: 'flex-start',
+    justifyContent: 'center',
+    alignItems: 'center',
+    padding: width * 0.05,
   },
   text: {
-    fontSize: 50,
+    fontSize: width * 0.1, // Dynamic font size based on screen width
     fontWeight: 'bold',
     color: '#333',
-    position: 'absolute',
-    zIndex: 1,
-    textAlign: 'left',
-    top: 70,
-    left: 50,
+    textAlign: 'flex-start',
+    marginBottom: height * 0.05,
+    left:-40,
   },
   rescuetext: {
     color: '#C35E26',
   },
-  salita: {
-    fontSize: 20,
-    fontWeight: 'bold',
-    color: '#000000',
-    textAlign: 'center',
-    marginTop: 570,
-    marginLeft: 110,
-    zIndex:1,
-    position:'absolute',
+  image: {
+    width: width * 0.6, // 60% of screen width
+    height: width * 0.6, // Maintain square aspect ratio
+    resizeMode: 'contain',
+    marginBottom: height * 0.05,
   },
   button: {
-    top: 610,
-    left: 95,
-    padding: 10,
     backgroundColor: '#C35E26',
     borderRadius: 20,
-    width: 200,
-    height: 30,
-    zIndex:0,
-    position:'absolute',
-    paddingHorizontal: 30,
-    paddingVertical: 2,
+    paddingVertical: height * 0.015, // Dynamic vertical padding
+    paddingHorizontal: width * 0.2, // Dynamic horizontal padding
+    marginBottom: height * 0.03,
   },
   buttonText: {
     color: '#FFFFFF',
     textAlign: 'center',
-    fontSize: 18,
+    fontSize: width * 0.05, // Dynamic font size based on screen width
   },
-  image: {
-    width: 270,
-    height: 270,
-    position: 'absolute',
-    top: 270,
-    left: 60,
-    zIndex: 0,
+  salita: {
+    fontSize: width * 0.05, // Dynamic font size based on screen width
+    fontWeight: 'bold',
+    color: '#000000',
+    textAlign: 'center',
   },
-
 });

@@ -1,7 +1,9 @@
 import React, { useState, useEffect } from 'react';
-import { View, Text, Image, StyleSheet, TouchableOpacity, Modal, FlatList, TextInput } from 'react-native';
-import { useNavigation } from '@react-navigation/native';
-import DatePicker from 'react-native-ui-datepicker';
+import { View, Text, Image, StyleSheet, TouchableOpacity, Modal, FlatList, TextInput, Dimensions } from 'react-native';
+import { useNavigation, useRoute } from '@react-navigation/native'; // Import useRoute
+
+// Get screen dimensions
+const { width, height } = Dimensions.get('window');
 
 export default function Medicalsched() {
     const [modalVisible, setModalVisible] = useState(false); // Modal state
@@ -14,6 +16,8 @@ export default function Medicalsched() {
         pet: ''
     });
     const navigation = useNavigation();
+    const route = useRoute(); // Get the route object to access params
+    const { username } = route.params; // Access username from route params
 
     // Fetch schedules from the backend when the component mounts
     useEffect(() => {
@@ -58,7 +62,8 @@ export default function Medicalsched() {
                 SchedDate: newSchedule.date,
                 SchedTime: newSchedule.time,
                 SchedVetClinic: newSchedule.vetClinic,
-                SchedPet: newSchedule.pet
+                SchedPet: newSchedule.pet,
+                Username: username // Add the username here
             })
         })
         .then((response) => response.json())
@@ -194,6 +199,7 @@ export default function Medicalsched() {
         </View>
     );
 }
+
 const styles = StyleSheet.create({
     container: {
         flex: 1,
@@ -201,11 +207,11 @@ const styles = StyleSheet.create({
         backgroundColor: '#E9E9E9',
     },
     title: {
-        fontSize: 50,
+        fontSize: width > 400 ? 50 : 30, // Dynamic font size based on screen width
         fontWeight: 'bold',
         textAlign: 'flex-start',
-        marginTop: 50,
-        marginLeft: 50,
+        marginTop: width > 400 ? 50 : 30,
+        marginLeft: width > 400 ? 50 : 30,
         color: '#C35E26',
     },
     scheduleList: {
@@ -223,19 +229,19 @@ const styles = StyleSheet.create({
         shadowRadius: 3,
     },
     scheduleTitle: {
-        fontSize: 18,
+        fontSize: width > 400 ? 18 : 14, // Dynamic font size for schedule title
         fontWeight: 'bold',
         color: '#C35E26',
         marginBottom: 5,
     },
     scheduleDetail: {
-        fontSize: 14,
+        fontSize: width > 400 ? 14 : 12, // Dynamic font size for details
         color: '#45362F',
     },
     Addbutton: {
         position: 'absolute',
-        bottom: 130,
-        left: 150,
+        bottom: width > 400 ? 120 : 80,
+        left: width > 400 ? 150 : 125,
         padding: 15,
         borderRadius: 40,
         zIndex: 10,
@@ -256,7 +262,7 @@ const styles = StyleSheet.create({
         height: 10,
     },
     titlesched: {
-        fontSize: 24,
+        fontSize: width > 400 ? 24 : 20, // Adjust title size in modal
         fontWeight: 'bold',
         color: '#D27D2D',
         marginBottom: 30,
@@ -275,14 +281,14 @@ const styles = StyleSheet.create({
         paddingVertical: 8,
         paddingHorizontal: 20,
         alignItems: 'center',
-        width: 270,
+        width: width > 400 ? 270 : 200,
         height: 40,
         left: 0,
     },
     addButtonText: {
         color: '#fff',
         fontWeight: 'bold',
-        fontSize: 18,
+        fontSize: width > 400 ? 18 : 16,
     },
     editText: {
         color: '#D27D2D',
@@ -292,40 +298,41 @@ const styles = StyleSheet.create({
     },
 
     footer: {
-      flexDirection: 'row',
-      justifyContent: 'space-evenly',
-      alignItems: 'center',
-      position: 'absolute',
-      bottom: 70,
-      paddingVertical: 10,
-      paddingHorizontal: 20,
-      borderRadius: 30,
-      backgroundColor: '#C35E26',
-      alignSelf: 'center',
-      width: '90%',
-  },
-  footerButton: {
-      alignItems: 'center',
-      padding: 10,
-  },
-  icon: {
-      width: 70,
-      height: 30,
-  },
+        flexDirection: 'row',
+        justifyContent: 'space-evenly',
+        alignItems: 'center',
+        position: 'absolute',
+        bottom: height * 0.05,
+        paddingVertical: 10,
+        paddingHorizontal: 20,
+        borderRadius: 30,
+        backgroundColor: '#C35E26',
+        alignSelf: 'center',
+        width: width * 0.9,
+        height: height * 0.09,
+      },
+      footerButton: {
+        alignItems: 'center',
+        padding: 10,
+      },
+      icon: {
+        width: 70,
+        height: 30,
+      },
 
-  modalBackground: {
-      flex: 1,
-      backgroundColor: 'rgba(0, 0, 0, 0.5)', 
-      justifyContent: 'center',
-      alignItems: 'center',
-  },
-  modalContainer: {
-      width: 400,
-      height: 700,
-      backgroundColor: '#E9E9E9',
-      borderRadius: 30,
-      padding: 20,
-      alignItems: 'center',
-      top: 100,
-  },
+    modalBackground: {
+        flex: 1,
+        backgroundColor: 'rgba(0, 0, 0, 0.5)', 
+        justifyContent: 'center',
+        alignItems: 'center',
+    },
+    modalContainer: {
+        width: width > 400 ? 400 : 300,
+        height: height > 600 ? 700 : 500,
+        backgroundColor: '#E9E9E9',
+        borderRadius: 30,
+        padding: 20,
+        alignItems: 'center',
+        top: 100,
+    },
 });
