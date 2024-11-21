@@ -1,14 +1,15 @@
 import React, { useState } from 'react';
-import { View, Text, TextInput, StyleSheet, TouchableOpacity, Alert,Image } from 'react-native';
+import { View, Text, TextInput, StyleSheet, TouchableOpacity, Alert, Image } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
 
-export default function Changepassword() {
+export default function Changepassword({ route }) {
   const navigation = useNavigation();
+
   const [currentPassword, setCurrentPassword] = useState('');
   const [newPassword, setNewPassword] = useState('');
   const [confirmNewPassword, setConfirmNewPassword] = useState('');
 
-  const handleChangePassword = () => {
+  const handleChangePassword = async () => {
     if (!currentPassword || !newPassword || !confirmNewPassword) {
       Alert.alert("Error", "Please fill out all fields.");
       return;
@@ -19,15 +20,37 @@ export default function Changepassword() {
       return;
     }
 
-    // Add your password change logic here (e.g., API call)
-    Alert.alert("Success", "Your password has been changed.");
-    navigation.goBack();
+    try {
+      const response = await fetch('https://compawnion-backend.onrender.com/Compawnions/login', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          username,
+          currentPassword,
+          newPassword,
+        }),
+      });
+
+      const result = await response.json();
+
+      if (result.success) {
+        Alert.alert("Success", "Your password has been changed.");
+        navigation.goBack();
+      } else {
+        Alert.alert("Error", result.message || "Password change failed.");
+      }
+    } catch (error) {
+      Alert.alert("Error", "An error occurred while changing the password.");
+      console.error('Error changing password:', error);
+    }
   };
 
   return (
     <View style={styles.container}>
       <TouchableOpacity style={styles.backButton} onPress={() => navigation.goBack()}>
-      <Image source={require('../assets/pcs/Backbutton.png')} style={styles.back}/>
+        <Image source={require('../assets/pcs/Backbutton.png')} style={styles.back} />
       </TouchableOpacity>
       <Text style={styles.title}>Change Password</Text>
 

@@ -13,45 +13,42 @@ export default function Homepage({ route }) {
   const [profileImage, setProfileImage] = useState('');
   const [appPetID, setAppPetID] = useState('');
 
+  // Fetch username, profile image, and appPetID from AsyncStorage or route params
   useEffect(() => {
     const fetchData = async () => {
-      try {
-        const storedUsername = route?.params?.username || (await AsyncStorage.getItem('username'));
-        const storedProfileImage = await AsyncStorage.getItem('profileImage');
-        const storedAppPetID = await AsyncStorage.getItem('appPetID');
-        
-        setUsername(storedUsername || 'User');
-        setProfileImage(storedProfileImage || '');
-        setAppPetID(storedAppPetID || '');
-
-        if (storedAppPetID) {
-          fetchPets(storedAppPetID);
-        }
-      } catch (error) {
-        console.error('Error loading data from AsyncStorage:', error);
-      }
+      const storedUsername = route?.params?.username || await AsyncStorage.getItem('username');
+      const storedProfileImage = await AsyncStorage.getItem('profileImage');
+      const storedAppPetID = await AsyncStorage.getItem('appPetID'); // Get appPetID from storage
+      setUsername(storedUsername || 'User');
+      setProfileImage(storedProfileImage || ''); // Default profile image if not found
+      setAppPetID(storedAppPetID || ''); // Set appPetID if available
     };
-
     fetchData();
   }, [route]);
 
-  const fetchPets = async (appPetID) => {
-    try {
-      console.log('Fetching pets for appPetID:', appPetID); // Debugging log
-      const response = await axios.get(`https://compawnion-backend.onrender.com/adoptedAnimals/${appPetID}`);
-      
-      if (response.data && Array.isArray(response.data.pets)) {
-        setPets(response.data.pets); // Assuming "pets" is an array from the response
-      } else {
-        console.warn('No pets found for this appPetID.');
-        setPets([]);
-      }
-    } catch (error) {
-      console.error('Error fetching pets:', error);
+  // Fetch pet data based on appPetID from the backend
+  useEffect(() => {
+    async function fetchPets() {
+        try {
+          const appPetID = await AsyncStorage.getItem('appPetID', appPetID);
+            const response = await axios.get(`https://compawnion-backend.onrender.com/adoptedAnimals/${appPetID}`);
+            
+            if (Array.isArray(response.data)) {
+                setPets(response.data);
+            } else {
+                setPets(Object.values(response.data).slice(1));
+                console.log(Object.values(response.data).slice(1));
+            }
+        } catch (error) {
+            console.error('Error fetching pets:', error);
+        }
     }
-  };
+
+    fetchPets();
+}, []);
 
   const handlePetPress = (pet) => {
+    // Navigate to pet detail screen
     navigation.navigate('Pets', { pet });
   };
 
@@ -60,7 +57,8 @@ export default function Homepage({ route }) {
   };
 
   const handleMedical = () => {
-    navigation.navigate('Medicalsched', { username });
+    // Navigate to medical schedule
+    navigation.navigate('Medicalsched');
   };
 
   const handleCompawns = () => {
@@ -69,36 +67,42 @@ export default function Homepage({ route }) {
 
   return (
     <View style={styles.container}>
+      {/* Username and Profile Picture Section */}
       <Text style={[styles.greeting, styles.fontStyle]}>Hello,{"\n"}{username}</Text>
 
       <TouchableOpacity onPress={handleProfilePress}>
         <Image
-          source={profileImage ? { uri: profileImage } : require('../assets/pcs/Dog.png')}
+          source={profileImage ? { uri: profileImage } : require('../assets/pcs/Dog.png')} // Check if profileImage exists, use URI or fallback to local image
           style={styles.profilePic}
         />
       </TouchableOpacity>
 
+      {/* Donate Card */}
       <View style={styles.donateCard}>
         <Image source={require('../assets/pcs/Dog.png')} style={styles.dogImage} />
-        <Text style={[styles.donateText, styles.fontStyle]}>Please{"\n"}Please Please{"\n"}Mag donate po~.</Text>
+        <Text style={[styles.donateText, styles.fontStyle, { fontFamily: 'Poppins-Regular' }]}>
+          Please{"\n"}Please Please{"\n"}Mag donate po~.
+        </Text>
         <TouchableOpacity style={styles.donateButton}>
           <Text style={styles.donateButtonText}>Donate Now</Text>
         </TouchableOpacity>
       </View>
 
-      <View style={styles.centerContainer}>
-        <Text style={[styles.myPets, styles.fontStyle]}>My Pets</Text>
-        <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={styles.petList}>
-          {pets.map((pet, index) => (
+       {/* My Pets Section */}
+       <View style={styles.centerContainer}>
+    <Text style={[styles.myPets, styles.fontStyle]}>My Pets</Text>
+    <ScrollView horizontal showsHorizontalScrollIndicator={false}
+        contentContainerStyle={styles.petList}>
+        {pets.map((pet, index) => (
             <TouchableOpacity key={index} style={styles.petCard} onPress={() => handlePetPress(pet)}>
-              <Image source={{ uri: pet.personal.picture }} style={styles.petImage} />
-              <Text style={styles.petName}>{pet.personal.name}</Text>
-              <Text style={styles.petBreed}>{pet.personal.breed}</Text>
+                <Image source={{ uri: pet.personal.picture }} style={styles.petImage} />
+                <Text style={styles.petName}>{pet.personal.name}</Text>
+                <Text style={styles.petBreed}>{pet.personal.breed}</Text>
             </TouchableOpacity>
-          ))}
-        </ScrollView>
-      </View>
-
+        ))}
+    </ScrollView>
+</View>
+      {/* Footer */}
       <View style={styles.footer}>
         <TouchableOpacity style={styles.footerButton} onPress={handleMedical}>
           <Image source={require('../assets/pcs/Medical.png')} style={styles.icon} />
@@ -113,6 +117,7 @@ export default function Homepage({ route }) {
     </View>
   );
 }
+
 
 const styles = StyleSheet.create({
   container: {
@@ -133,28 +138,28 @@ const styles = StyleSheet.create({
     height: width * 0.20,
     borderRadius: 100,
     position: 'absolute',
-    right: width * 0.40,
-    top: height * -0.10,
+    right:width * 0.40,
+    top: height *-0.10,
   },
   centerContainer: {
-    flex: 1,
-    justifyContent: 'center',
-    alignItems: 'center',
-    top: height * -0.15,
-  },
-  myPets: {
+    flex: 1,                   // Takes up available space between "Donate" and footer
+    justifyContent: 'center',   // Centers content vertically
+    alignItems: 'center', 
+    top:height * -0.15,     // Centers content horizontally
+},
+myPets: {
     fontSize: width * 0.09,
     fontWeight: 'bold',
     color: '#C35E26',
-    marginBottom: 20,
-    top: height * 0.14,
-    left: width * -0.25,
-  },
-  petList: {
+    marginBottom: 20,  
+    top:height *0.14,
+    left:width *-0.25,
+},
+petList: {
     flexDirection: 'row',
-    alignItems: 'center',
-  },
-  petCard: {
+    alignItems: 'center',       // Center-aligns items within the row
+},
+petCard: {
     backgroundColor: '#FFF',
     borderRadius: 20,
     padding: 10,
@@ -167,22 +172,22 @@ const styles = StyleSheet.create({
     shadowOpacity: 0.1,
     shadowRadius: 4,
     elevation: 3,
-    top: height * 0.05,
-  },
-  petImage: {
+    top:height * 0.05,
+},
+petImage: {
     width: width * 0.30,
     height: height * 0.15,
     borderRadius: 15,
-  },
-  petName: {
+},
+petName: {
     fontSize: 18,
     fontWeight: 'bold',
     color: '#C35E26',
-  },
-  petBreed: {
+},
+petBreed: {
     fontSize: 14,
     color: '#45362F',
-  },
+},
   donateCard: {
     backgroundColor: '#C35E26',
     borderRadius: 20,

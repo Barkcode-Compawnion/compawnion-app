@@ -1,13 +1,15 @@
 import React, { useState, useEffect } from 'react';
-import { View, Text, Image, StyleSheet, TouchableOpacity, Modal, FlatList, TextInput, Dimensions } from 'react-native';
-import { useNavigation, useRoute } from '@react-navigation/native'; // Import useRoute
+import { 
+    View, Text, Image, StyleSheet, TouchableOpacity, Modal, FlatList, 
+    TextInput, Dimensions, ActivityIndicator, Alert 
+} from 'react-native';
+import { useNavigation, useRoute } from '@react-navigation/native';
 
-// Get screen dimensions
 const { width, height } = Dimensions.get('window');
 
 export default function Medicalsched() {
-    const [modalVisible, setModalVisible] = useState(false); // Modal state
-    const [schedules, setSchedules] = useState([]); // Store fetched schedules
+    const [modalVisible, setModalVisible] = useState(false);
+    const [schedules, setSchedules] = useState([]);
     const [newSchedule, setNewSchedule] = useState({
         title: '',
         date: '',
@@ -15,73 +17,60 @@ export default function Medicalsched() {
         vetClinic: '',
         pet: ''
     });
-    const navigation = useNavigation();
-    const route = useRoute(); // Get the route object to access params
-    const { username } = route.params; // Access username from route params
+    const [loading, setLoading] = useState(true);
+    const [error, setError] = useState(null);
 
-    // Fetch schedules from the backend when the component mounts
+    const navigation = useNavigation();
+    const route = useRoute();
+
     useEffect(() => {
-        fetch('https://compawnion-backend.onrender.com/Compawnions/addDetails')
-            .then((response) => response.json())
-            .then((data) => {
-                setSchedules(data); // Save data to state
-            })
-            .catch((error) => {
-                console.error('Error fetching schedules:', error);
-            });
+        fetchSchedules();
     }, []);
 
-    // Navigation functions
-    const handleHomep = () => navigation.navigate('Homepage');
-    const handleCompawns = () => navigation.navigate('Compawnionsched');
-    const handletrustvet = () => {
-        setModalVisible(false); // Close modal on navigating
-        navigation.navigate('Trustedveti');
+    const fetchSchedules = async () => {
+        setLoading(true);
+        try {
+            const response = await fetch('https://compawnion-backend.onrender.com/Compawnions/addDetails');
+            const data = await response.json();
+            setSchedules(data); 
+        } catch (err) {
+            setError('Failed to fetch schedules. Please try again.');
+            console.error('Error fetching schedules:', err);
+        } finally {
+            setLoading(false);
+        }
     };
 
-    // Render each schedule item
-    const renderScheduleItem = ({ item }) => (
-        <View style={styles.scheduleItem}>
-            <Text style={styles.scheduleTitle}>{item.title}</Text>
-            <Text style={styles.scheduleDetail}>Date: {item.date}</Text>
-            <Text style={styles.scheduleDetail}>Time: {item.time}</Text>
-            <Text style={styles.scheduleDetail}>Vet Clinic: {item.vetClinic}</Text>
-            <Text style={styles.scheduleDetail}>Pet: {item.pet}</Text>
-        </View>
-    );
+    const addNewSchedule = async () => {
+        try {
+            const response = await fetch('https://compawnion-backend.onrender.com/Compawnions/addDetails', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                    SchedTitle: newSchedule.title,
+                    SchedDate: newSchedule.date,
+                    SchedTime: newSchedule.time,
+                    SchedVetClinic: newSchedule.vetClinic,
+                    SchedPet: newSchedule.pet,
+                    Username: username
+                })
+            });
 
-    // Add a new schedule to the list and send it to the backend
-    const addNewSchedule = () => {
-        fetch('https://compawnion-backend.onrender.com/Compawnions/addDetails', {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json'
-            },
-            body: JSON.stringify({
-                SchedTitle: newSchedule.title,
-                SchedDate: newSchedule.date,
-                SchedTime: newSchedule.time,
-                SchedVetClinic: newSchedule.vetClinic,
-                SchedPet: newSchedule.pet,
-                Username: username // Add the username here
-            })
-        })
-        .then((response) => response.json())
-        .then((data) => {
-            if (data.success) {
-                setSchedules([...schedules, newSchedule]); // Update frontend state
-                resetForm(); // Reset input fields
-                setModalVisible(false); // Close modal
+            const result = await response.json();
+            if (result.success) {
+                Alert.alert('Success', 'Schedule added successfully!');
+                setSchedules([...schedules, newSchedule]);
+                resetForm();
+                setModalVisible(false);
             } else {
-                console.error('Failed to add schedule:', data.message);
+                Alert.alert('Error', result.message || 'Failed to add schedule.');
             }
-        })
-        .catch((error) => {
-            console.error('Error adding schedule:', error);
-        });
+        } catch (err) {
+            Alert.alert('Error', 'An error occurred while adding the schedule.');
+            console.error('Error adding schedule:', err);
+        }
     };
 
-    // Reset form fields after adding a schedule
     const resetForm = () => {
         setNewSchedule({
             title: '',
@@ -92,11 +81,38 @@ export default function Medicalsched() {
         });
     };
 
+    const renderScheduleItem = ({ item }) => (
+        <View style={styles.scheduleItem}>
+            <Text style={styles.scheduleTitle}>{item.title}</Text>
+            <Text style={styles.scheduleDetail}>Date: {item.date}</Text>
+            <Text style={styles.scheduleDetail}>Time: {item.time}</Text>
+            <Text style={styles.scheduleDetail}>Vet Clinic: {item.vetClinic}</Text>
+            <Text style={styles.scheduleDetail}>Pet: {item.pet}</Text>
+        </View>
+    );
+
+    const handleHomep = () => navigation.navigate('Homepage');
+    const handleCompawns = () => navigation.navigate('Compawnionsched');
+
+    if (loading) {
+        return <ActivityIndicator size="large" color="#C35E26" style={styles.loader} />;
+    }
+
+    if (error) {
+        return (
+            <View style={styles.errorContainer}>
+                <Text style={styles.errorText}>{error}</Text>
+                <TouchableOpacity onPress={fetchSchedules} style={styles.retryButton}>
+                    <Text style={styles.retryText}>Retry</Text>
+                </TouchableOpacity>
+            </View>
+        );
+    }
+
     return (
         <View style={styles.container}>
             <Text style={styles.title}>Medical{"\n"}Schedules</Text>
 
-            {/* FlatList for displaying schedules */}
             <FlatList
                 data={schedules}
                 keyExtractor={(item, index) => index.toString()}
@@ -104,57 +120,41 @@ export default function Medicalsched() {
                 contentContainerStyle={styles.scheduleList}
             />
 
-            {/* Add Button for Modal */}
-            <TouchableOpacity
-                style={styles.Addbutton}
-                onPress={() => setModalVisible(true)} // Trigger Modal visibility
-            >
+            <TouchableOpacity style={styles.Addbutton} onPress={() => setModalVisible(true)}>
                 <Image source={require('../assets/pcs/Plus.png')} style={styles.Addmed} />
             </TouchableOpacity>
 
-            {/* Modal for adding schedule */}
             <Modal
                 animationType="slide"
-                transparent={true} // Ensure background is transparent
-                visible={modalVisible} // Conditional rendering of the modal
-                onRequestClose={() => setModalVisible(false)} // Close modal on request
+                transparent={true}
+                visible={modalVisible}
+                onRequestClose={() => setModalVisible(false)}
             >
                 <View style={styles.modalBackground}>
                     <View style={styles.modalContainer}>
-                        {/* Close Button */}
-                        <TouchableOpacity
-                            style={styles.Closebutton}
-                            onPress={() => setModalVisible(false)} // Close modal
-                        >
+                        <TouchableOpacity style={styles.Closebutton} onPress={() => setModalVisible(false)}>
                             <Image source={require('../assets/pcs/Linec.png')} style={styles.Closemed} />
                         </TouchableOpacity>
                         <Text style={styles.titlesched}>Add New Schedule</Text>
 
-                        {/* Input Fields for Schedule */}
                         <TextInput
                             style={styles.input}
                             placeholder="Schedule Title"
                             value={newSchedule.title}
                             onChangeText={(text) => setNewSchedule({ ...newSchedule, title: text })}
                         />
-
-                        {/* Date Input */}
                         <TextInput
                             style={styles.input}
                             placeholder="Enter Date (YYYY-MM-DD)"
                             value={newSchedule.date}
                             onChangeText={(text) => setNewSchedule({ ...newSchedule, date: text })}
                         />
-
-                        {/* Time Input */}
                         <TextInput
                             style={styles.input}
                             placeholder="Enter Time (HH:mm)"
                             value={newSchedule.time}
                             onChangeText={(text) => setNewSchedule({ ...newSchedule, time: text })}
                         />
-
-                        {/* Vet Clinic and Pet Inputs */}
                         <TextInput
                             style={styles.input}
                             placeholder="Vet Clinic"
@@ -168,23 +168,14 @@ export default function Medicalsched() {
                             onChangeText={(text) => setNewSchedule({ ...newSchedule, pet: text })}
                         />
 
-                        {/* Add Schedule Button */}
-                        <TouchableOpacity
-                            style={styles.addingButton}
-                            onPress={addNewSchedule} // Add the new schedule
-                        >
+                        <TouchableOpacity style={styles.addingButton} onPress={addNewSchedule}>
                             <Text style={styles.addButtonText}>Add Schedule</Text>
-                        </TouchableOpacity>
-
-                        {/* Edit Trusted Vet Button */}
-                        <TouchableOpacity onPress={handletrustvet}>
-                            <Text style={styles.editText}>Edit trusted Veterinarian Clinics</Text>
                         </TouchableOpacity>
                     </View>
                 </View>
             </Modal>
 
-            {/* Footer buttons for navigation */}
+            {/* Footer */}
             <View style={styles.footer}>
                 <TouchableOpacity style={styles.footerButton}>
                     <Image source={require('../assets/pcs/Medicalb.png')} style={styles.icon} />

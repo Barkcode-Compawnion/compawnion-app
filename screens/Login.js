@@ -30,8 +30,11 @@ export default function Login() {
       });
 
       const data = await response.json();
+      console.log(data);
+      
       if (response.ok) {
         await AsyncStorage.setItem('authToken', data.token);
+        await AsyncStorage.setItem('appPetID', data.appPetID);
         await AsyncStorage.setItem('username', username);
         Alert.alert('Success', 'Login successful!');
         navigation.navigate('Homepage', { username });
