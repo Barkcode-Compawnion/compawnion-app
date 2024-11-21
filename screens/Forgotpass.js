@@ -50,7 +50,7 @@ export default function ForgotPass() {
             <TextInput
                 style={styles.email}
                 placeholder="Enter your email"
-                placeholderTextColor="#888"
+                placeholderTextColor="#888888"
                 onChangeText={(text) => setEmail(text)}
                 value={email}
                 keyboardType="email-address"

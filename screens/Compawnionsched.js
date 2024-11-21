@@ -1,86 +1,77 @@
 import React, { useEffect, useState } from 'react';
 import { View, Text, StyleSheet, TouchableOpacity, Alert, FlatList, Image } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 import axios from 'axios';
 
-export default function Compawnionsched() {
+export default function MedicalSched() {
   const navigation = useNavigation();
-  const [compawnionSched, setCompawnionSched] = useState([]);
+  const [medSched, setMedSched] = useState([]);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    // Fetch the CompawnionSched data from the backend
-    const fetchCompawnionSched = async () => {
+    // Fetch the MedSched data from the backend
+    const fetchMedicalSchedules = async () => {
       try {
-        const response = await axios.get('https://compawnion-backend.onrender.com/Compawnions/CompawnionSched'); // Adjust the URL as needed
-        setCompawnionSched(response.data.data); // Assuming the response contains a 'data' field
+        const companionId = await AsyncStorage.getItem('companionId'); 
+        const response = await axios.get(
+          `https://compawnion-backend.onrender.com/Compawnions/schedules/${companionId}` // Adjust the URL as needed
+        );
+        const data = response.data.data; // Assuming response contains 'data.data'
+        setMedSched(data.MedSched); // Set the MedSched data
         setLoading(false);
       } catch (error) {
-        console.error("Error fetching schedule:", error);
+        console.error('Error fetching schedules:', error);
         setLoading(false);
         Alert.alert('Error', 'Failed to fetch schedules');
       }
     };
 
-    fetchCompawnionSched();
+    fetchMedicalSchedules();
   }, []);
 
-  const handleHomep = () => {
-    navigation.navigate('Homepage');
+  const handleViewDetails = (schedule) => {
+    // Navigate to a detail screen and pass schedule data
+    navigation.navigate('ScheduleDetails', { schedule });
   };
 
-  const handleMedical = () => {
-    navigation.navigate('Medicalsched');
-  };
-
-  const handleContactSupport = () => {
-    Alert.alert('Contact Support', 'You can reach out to barkcodecompawnion@gmail.com');
-  };
-
-  const handleViewDetails = (schedId) => {
-    // Navigate to a detail screen and pass the schedule ID or other necessary data
-    navigation.navigate('ScheduleDetails', { schedId });
-  };
-
-  const renderSchedItem = ({ item }) => {
-    return (
-      <View style={styles.scheduleBox}>
-        <Text style={styles.scheduleTitle}>{item.EventTitle}</Text>
-        <Text style={styles.scheduleDetails}>Date: {item.CSDate}</Text>
-        <Text style={styles.scheduleDetails}>Time: {item.CSTime}</Text>
-        <TouchableOpacity
-          style={styles.detailsButton}
-          onPress={() => handleViewDetails(item.id)} // Assuming each item has an 'id' field
-        >
-          <Text style={styles.detailsButtonText}>View Details</Text>
-        </TouchableOpacity>
-      </View>
-    );
-  };
+  const renderScheduleItem = ({ item }) => (
+    <View style={styles.scheduleBox}>
+      <Text style={styles.scheduleTitle}>{item.SchedTitle}</Text>
+      <Text style={styles.scheduleDetails}>Date: {item.SchedDate}</Text>
+      <Text style={styles.scheduleDetails}>Time: {item.SchedTime}</Text>
+      <Text style={styles.scheduleDetails}>Pet: {item.SchedPet}</Text>
+      <Text style={styles.scheduleDetails}>Vet Clinic: {item.SchedVetClinic}</Text>
+      <TouchableOpacity
+        style={styles.detailsButton}
+        onPress={() => handleViewDetails(item)}
+      >
+        <Text style={styles.detailsButtonText}>View Details</Text>
+      </TouchableOpacity>
+    </View>
+  );
 
   return (
     <View style={styles.container}>
-      <Text style={styles.title}>Compawnions{"\n"}Schedules</Text>
-      <TouchableOpacity onPress={handleContactSupport}>
-        <Text style={styles.contactSupport}>Contact Support</Text>
-      </TouchableOpacity>
+      <Text style={styles.title}>Medical Schedules</Text>
 
       {loading ? (
         <Text>Loading...</Text>
       ) : (
         <FlatList
-          data={compawnionSched}
-          renderItem={renderSchedItem}
-          keyExtractor={(item) => item.id.toString()} // Assuming each schedule has a unique 'id'
+          data={medSched}
+          renderItem={renderScheduleItem}
+          keyExtractor={(item, index) => index.toString()} // Use index as key if no unique ID exists
+          ListEmptyComponent={<Text>No schedules available.</Text>} // Handle empty MedSched
         />
       )}
 
       <View style={styles.footer}>
-        <TouchableOpacity style={styles.footerButton} onPress={handleMedical}>
-          <Image source={require('../assets/pcs/Medical.png')} style={styles.icon} />
-        </TouchableOpacity>
-        <TouchableOpacity style={styles.footerButton} onPress={handleHomep}>
+        <TouchableOpacity style={styles.footerButton} onPress={() => navigation.navigate('Homepage')}>
           <Image source={require('../assets/pcs/Home.png')} style={styles.icon} />
+        </TouchableOpacity>
+        <TouchableOpacity style={styles.footerButton} onPress={() => navigation.navigate('MedicalSched')}>
+          <Image source={require('../assets/pcs/Medical.png')} style={styles.icon} />
         </TouchableOpacity>
         <TouchableOpacity style={styles.footerButton}>
           <Image source={require('../assets/pcs/Calendarb.png')} style={styles.icon} />
@@ -97,21 +88,11 @@ const styles = StyleSheet.create({
     backgroundColor: '#E9E9E9',
   },
   title: {
-    fontSize: 40,
+    fontSize: 24,
     fontWeight: 'bold',
-    textAlign: 'flex-start',
-    top: 50,
-    marginLeft: 50,
+    textAlign: 'center',
+    marginBottom: 20,
     color: '#C35E26',
-    position: 'absolute',
-    zIndex: 1,
-  },
-  contactSupport: {
-    fontSize: 12,
-    color: '#C35E26',
-    textDecorationLine: 'underline',
-    top: 670,
-    left: 140,
   },
   scheduleBox: {
     backgroundColor: 'white',

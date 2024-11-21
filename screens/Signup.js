@@ -85,7 +85,7 @@ export default function Signup() {
       <TextInput
         style={styles.input}
         placeholder="Enter your Application ID"
-        placeholderTextColor="#888"
+        placeholderTextColor="#888888"
         onChangeText={setApplicationID}
         value={applicationID}
         autoCapitalize="none"
@@ -95,7 +95,7 @@ export default function Signup() {
       <TextInput
         style={styles.input}
         placeholder="Enter your username"
-        placeholderTextColor="#888"
+        placeholderTextColor="#888888"
         onChangeText={setUsername}
         value={username}
         autoCapitalize="none"
@@ -105,7 +105,7 @@ export default function Signup() {
       <TextInput
         style={styles.input}
         placeholder="Enter your email"
-        placeholderTextColor="#888"
+        placeholderTextColor="#888888"
         onChangeText={setEmail}
         value={email}
         keyboardType="email-address"
@@ -116,7 +116,7 @@ export default function Signup() {
       <TextInput
         style={styles.input}
         placeholder="Enter your password"
-        placeholderTextColor="#888"
+        placeholderTextColor="#888888"
         onChangeText={setPassword}
         value={password}
         secureTextEntry
@@ -126,7 +126,7 @@ export default function Signup() {
       <TextInput
         style={styles.input}
         placeholder="Re-enter your password"
-        placeholderTextColor="#888"
+        placeholderTextColor="#888888"
         onChangeText={setConfirmPassword}
         value={confirmPassword}
         secureTextEntry

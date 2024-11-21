@@ -36,6 +36,7 @@ export default function Login() {
         await AsyncStorage.setItem('authToken', data.token);
         await AsyncStorage.setItem('appPetID', data.appPetID);
         await AsyncStorage.setItem('username', username);
+        await AsyncStorage.setItem('companionId', data.companionId);
         Alert.alert('Success', 'Login successful!');
         navigation.navigate('Homepage', { username });
       } else {
@@ -56,7 +57,7 @@ export default function Login() {
       <TextInput
         style={styles.username}
         placeholder="Username"
-        placeholderTextColor="#888"
+        placeholderTextColor="#888888"
         onChangeText={setUsername}
         value={username}
         keyboardType="email-address"
@@ -65,7 +66,7 @@ export default function Login() {
       <TextInput
         style={styles.password}
         placeholder="Password"
-        placeholderTextColor="#888"
+        placeholderTextColor="#888888"
         onChangeText={setPassword}
         value={password}
         secureTextEntry

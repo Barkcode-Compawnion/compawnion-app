@@ -48,7 +48,7 @@ export default function Resetpass() {
             <TextInput
                 style={styles.input}
                 placeholder="Enter new password"
-                placeholderTextColor="#888"
+                placeholderTextColor="#888888"
                 onChangeText={setPassword}
                 value={password}
                 secureTextEntry
@@ -58,7 +58,7 @@ export default function Resetpass() {
             <TextInput
                 style={styles.input}
                 placeholder="Confirm new password"
-                placeholderTextColor="#888"
+                placeholderTextColor="#888888"
                 onChangeText={setRePassword}
                 value={repassword}
                 secureTextEntry

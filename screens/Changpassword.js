@@ -57,7 +57,7 @@ export default function Changepassword({ route }) {
       <TextInput
         style={styles.input}
         placeholder="Type Current Password"
-        placeholderTextColor="#888"
+        placeholderTextColor="#888888"
         secureTextEntry
         value={currentPassword}
         onChangeText={setCurrentPassword}
@@ -65,7 +65,7 @@ export default function Changepassword({ route }) {
       <TextInput
         style={styles.input}
         placeholder="Type New Password"
-        placeholderTextColor="#888"
+        placeholderTextColor="#888888"
         secureTextEntry
         value={newPassword}
         onChangeText={setNewPassword}
@@ -73,7 +73,7 @@ export default function Changepassword({ route }) {
       <TextInput
         style={styles.input}
         placeholder="Confirm New Password"
-        placeholderTextColor="#888"
+        placeholderTextColor="#888888"
         secureTextEntry
         value={confirmNewPassword}
         onChangeText={setConfirmNewPassword}
