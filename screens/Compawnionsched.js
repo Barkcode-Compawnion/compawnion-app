@@ -1,8 +1,10 @@
 import React, { useEffect, useState } from 'react';
-import { View, Text, StyleSheet, TouchableOpacity, Alert, FlatList, Image } from 'react-native';
+import { View, Text, StyleSheet, TouchableOpacity, Alert, FlatList, Image, Dimensions } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import axios from 'axios';
+
+const { width, height } = Dimensions.get('window');
 
 export default function MedicalSched() {
   const navigation = useNavigation();
@@ -67,11 +69,11 @@ export default function MedicalSched() {
       )}
 
       <View style={styles.footer}>
+        <TouchableOpacity style={styles.footerButton} onPress={() => navigation.navigate('Medicalsched')}>
+          <Image source={require('../assets/pcs/Medical.png')} style={styles.icon} />
+        </TouchableOpacity>
         <TouchableOpacity style={styles.footerButton} onPress={() => navigation.navigate('Homepage')}>
           <Image source={require('../assets/pcs/Home.png')} style={styles.icon} />
-        </TouchableOpacity>
-        <TouchableOpacity style={styles.footerButton} onPress={() => navigation.navigate('MedicalSched')}>
-          <Image source={require('../assets/pcs/Medical.png')} style={styles.icon} />
         </TouchableOpacity>
         <TouchableOpacity style={styles.footerButton}>
           <Image source={require('../assets/pcs/Calendarb.png')} style={styles.icon} />
