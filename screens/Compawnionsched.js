@@ -6,7 +6,7 @@ import axios from 'axios';
 
 const { width, height } = Dimensions.get('window');
 
-export default function MedicalSched() {
+export default function Compawnionsched() {
   const navigation = useNavigation();
   const [medSched, setMedSched] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -17,7 +17,7 @@ export default function MedicalSched() {
       try {
         const companionId = await AsyncStorage.getItem('companionId'); 
         const response = await axios.get(
-          `https://compawnion-backend.onrender.com/Compawnions/schedules/${companionId}` // Adjust the URL as needed
+          `https://compawnion-backend.onrender.com/Compawnions/CompawnionSched/${companionId}` // Adjust the URL as needed
         );
         const data = response.data.data; // Assuming response contains 'data.data'
         setMedSched(data.MedSched); // Set the MedSched data
@@ -37,16 +37,14 @@ export default function MedicalSched() {
     navigation.navigate('ScheduleDetails', { schedule });
   };
 
-  const renderScheduleItem = ({ item }) => (
+  const renderScheduleItem = ({ schedule }) => (
     <View style={styles.scheduleBox}>
-      <Text style={styles.scheduleTitle}>{item.SchedTitle}</Text>
-      <Text style={styles.scheduleDetails}>Date: {item.SchedDate}</Text>
-      <Text style={styles.scheduleDetails}>Time: {item.SchedTime}</Text>
-      <Text style={styles.scheduleDetails}>Pet: {item.SchedPet}</Text>
-      <Text style={styles.scheduleDetails}>Vet Clinic: {item.SchedVetClinic}</Text>
+      <Text style={styles.scheduleTitle}>{schedule.EventTitle}</Text>
+      <Text style={styles.scheduleDetails}>Date: {schedule.CSDate}</Text>
+      <Text style={styles.scheduleDetails}>Time: {schedule.CSTime}</Text>
       <TouchableOpacity
         style={styles.detailsButton}
-        onPress={() => handleViewDetails(item)}
+        onPress={() => handleViewDetails(schedule.GmeetRoom)}
       >
         <Text style={styles.detailsButtonText}>View Details</Text>
       </TouchableOpacity>
@@ -55,7 +53,7 @@ export default function MedicalSched() {
 
   return (
     <View style={styles.container}>
-      <Text style={styles.title}>Medical Schedules</Text>
+      <Text style={styles.title}>Compawnions Schedules</Text>
 
       {loading ? (
         <Text>Loading...</Text>
@@ -63,7 +61,7 @@ export default function MedicalSched() {
         <FlatList
           data={medSched}
           renderItem={renderScheduleItem}
-          keyExtractor={(item, index) => index.toString()} // Use index as key if no unique ID exists
+          keyExtractor={(schedule, index) => index.toString()} // Use index as key if no unique ID exists
           ListEmptyComponent={<Text>No schedules available.</Text>} // Handle empty MedSched
         />
       )}

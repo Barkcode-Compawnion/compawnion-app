@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { View, Text, TextInput, StyleSheet, TouchableOpacity, Image, Alert, ScrollView, Dimensions } from 'react-native';
+import { View, Text, TextInput, StyleSheet, TouchableOpacity, Image, Alert, ScrollView, Dimensions, Modal } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
 import { launchImageLibrary } from 'react-native-image-picker'; // Import Image Picker
 import AsyncStorage from '@react-native-async-storage/async-storage';
@@ -16,6 +16,7 @@ export default function Profilescreen({ route }) {
   const [email, setEmail] = useState('');
   const [phoneNumber, setPhoneNumber] = useState('');
   const [profileImage, setProfileImage] = useState(route?.params?.profileImage || ''); // Default to current profile picture
+  const [showLogoutModal, setShowLogoutModal] = useState(false); // Modal visibility state
 
   useEffect(() => {
     loadProfileImage();
@@ -161,7 +162,7 @@ export default function Profilescreen({ route }) {
       <TouchableOpacity style={styles.changePasswordButton} onPress={handleChangePassword}>
         <Text style={styles.buttonCpass}>Change Password</Text>
       </TouchableOpacity>
-      <TouchableOpacity style={styles.logoutButton} onPress={handleLogout}>
+      <TouchableOpacity style={styles.logoutButton} onPress={() => setShowLogoutModal(true)}>
         <Text style={styles.buttonText}>Log Out</Text>
       </TouchableOpacity>
 
@@ -169,6 +170,38 @@ export default function Profilescreen({ route }) {
       <TouchableOpacity onPress={handleContactSupport}>
         <Text style={styles.contactSupport}>Contact Support</Text>
       </TouchableOpacity>
+
+      {/* Logout Confirmation Modal */}
+      <Modal
+        transparent={true}
+        visible={showLogoutModal}
+        animationType="fade"
+        onRequestClose={() => setShowLogoutModal(false)} // Close modal on back press
+      >
+        <View style={styles.modalOverlay}>
+          <View style={styles.modalContainer}>
+            <Text style={styles.modalTitle}>Log Out</Text>
+            <Text style={styles.modalMessage}>Are you sure you want to log out?</Text>
+            <View style={styles.modalButtonContainer}>
+              <TouchableOpacity
+                style={[styles.modalButton, styles.modalButtonYes]}
+                onPress={() => {
+                  setShowLogoutModal(false);
+                  handleLogout(); // Perform logout
+                }}
+              >
+                <Text style={styles.modalButtonText}>Yes</Text>
+              </TouchableOpacity>
+              <TouchableOpacity
+                style={[styles.modalButton, styles.modalButtonNo]}
+                onPress={() => setShowLogoutModal(false)}
+              >
+                <Text style={styles.modalButtonText}>No</Text>
+              </TouchableOpacity>
+            </View>
+          </View>
+        </View>
+      </Modal>
     </ScrollView>
   );
 }
@@ -203,7 +236,7 @@ const styles = StyleSheet.create({
   editImageText: {
     color: '#C35E26',
     fontSize: 14,
-    top: height*-0.01,
+    top: height * -0.01,
     textDecorationLine: 'underline',
   },
   input: {
@@ -212,7 +245,7 @@ const styles = StyleSheet.create({
     borderWidth: 1,
     borderRadius: 20,
     paddingHorizontal: 15,
-    marginTop:10,
+    marginTop: 10,
     backgroundColor: '#fff',
     fontSize: 16,
   },
@@ -230,8 +263,8 @@ const styles = StyleSheet.create({
     width: '90%',
     backgroundColor: '#fff',
     borderRadius: 20,
-    borderColor: '#ddd',
     borderWidth: 1,
+    borderColor: '#C35E26',
     justifyContent: 'center',
     alignItems: 'center',
     marginTop: 10,
@@ -239,8 +272,10 @@ const styles = StyleSheet.create({
   logoutButton: {
     height: 50,
     width: '90%',
-    backgroundColor: '#B22222',
+    backgroundColor: '#C32626',
     borderRadius: 20,
+    borderWidth: 1,
+    borderColor: '#C35E26',
     justifyContent: 'center',
     alignItems: 'center',
     marginTop: 10,
@@ -248,15 +283,63 @@ const styles = StyleSheet.create({
   buttonText: {
     color: '#fff',
     fontSize: 16,
-  },
-  contactSupport: {
-    fontSize: 12,
-    color: '#C35E26',
-    textDecorationLine: 'underline',
-    marginTop: 20,
+    fontWeight: 'bold',
   },
   buttonCpass: {
-    color: '#000000',
+    color: '#C35E26',
+    fontSize: 16,
+  },
+  contactSupport: {
+    color: '#C35E26',
+    fontSize: 14,
+    marginTop: 20,
+    textDecorationLine: 'underline',
+  },
+  modalOverlay: {
+    flex: 1,
+    backgroundColor: 'rgba(0, 0, 0, 0.5)',
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  modalContainer: {
+    width: '80%',
+    backgroundColor: '#fff',
+    borderRadius: 10,
+    padding: 20,
+    alignItems: 'center',
+  },
+  modalTitle: {
+    fontSize: 18,
+    fontWeight: 'bold',
+    color: '#C35E26',
+    marginBottom: 10,
+  },
+  modalMessage: {
+    fontSize: 16,
+    color: '#333',
+    marginBottom: 20,
+    textAlign: 'center',
+  },
+  modalButtonContainer: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    width: '100%',
+  },
+  modalButton: {
+    width: '45%',
+    height: 40,
+    justifyContent: 'center',
+    alignItems: 'center',
+    borderRadius: 5,
+  },
+  modalButtonYes: {
+    backgroundColor: '#C35E26',
+  },
+  modalButtonNo: {
+    backgroundColor: '#ddd',
+  },
+  modalButtonText: {
+    color: '#fff',
     fontSize: 16,
   },
 });
