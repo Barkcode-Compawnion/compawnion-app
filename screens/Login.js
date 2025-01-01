@@ -83,6 +83,7 @@ export default function Login() {
         // Save other tokens/data
         await AsyncStorage.setItem('authToken', data.token);
         await AsyncStorage.setItem('username', username);
+        await AsyncStorage.setItem('appPetID', data.appPetID);
         await AsyncStorage.setItem('companionId', data.companionId);
 
         Alert.alert('Success', 'Login successful!');

@@ -8,19 +8,28 @@ const { width, height } = Dimensions.get('window');
 
 export default function Compawnionsched() {
   const navigation = useNavigation();
-  const [medSched, setMedSched] = useState([]);
+  const [compawnionSched, setCompawnionSched] = useState([]);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    // Fetch the MedSched data from the backend
-    const fetchMedicalSchedules = async () => {
+    // Fetch the CompawnionSched data from the backend
+    const fetchCompawnionSchedules = async () => {
       try {
-        const companionId = await AsyncStorage.getItem('companionId'); 
+        const companionId = await AsyncStorage.getItem('companionId');
+        if (!companionId) {
+          throw new Error('Companion ID is missing');
+        }
+        
         const response = await axios.get(
-          `https://compawnion-backend.onrender.com/Compawnions/CompawnionSched/${companionId}` // Adjust the URL as needed
+          `https://compawnion-backend.onrender.com/Compawnions/CompawnionSched/${companionId}`
         );
         const data = response.data.data; // Assuming response contains 'data.data'
-        setMedSched(data.MedSched); // Set the MedSched data
+
+        if (Array.isArray(data)) {
+          setCompawnionSched(data);
+        } else {
+          throw new Error('Invalid data format');
+        }
         setLoading(false);
       } catch (error) {
         console.error('Error fetching schedules:', error);
@@ -29,7 +38,7 @@ export default function Compawnionsched() {
       }
     };
 
-    fetchMedicalSchedules();
+    fetchCompawnionSchedules();
   }, []);
 
   const handleViewDetails = (schedule) => {
@@ -37,14 +46,15 @@ export default function Compawnionsched() {
     navigation.navigate('ScheduleDetails', { schedule });
   };
 
-  const renderScheduleItem = ({ schedule }) => (
+  const renderScheduleItem = ({ item }) => (
     <View style={styles.scheduleBox}>
-      <Text style={styles.scheduleTitle}>{schedule.EventTitle}</Text>
-      <Text style={styles.scheduleDetails}>Date: {schedule.CSDate}</Text>
-      <Text style={styles.scheduleDetails}>Time: {schedule.CSTime}</Text>
+      <Text style={styles.scheduleTitle}>{item.EventTitle}</Text>
+      <Text style={styles.scheduleDetails}>Date: {item.CSDate}</Text>
+      <Text style={styles.scheduleDetails}>Time: {item.CSTime}</Text>
+      <Text style={styles.scheduleDetails}>Gmeet Room: {item.GmeetRoom}</Text>
       <TouchableOpacity
         style={styles.detailsButton}
-        onPress={() => handleViewDetails(schedule.GmeetRoom)}
+        onPress={() => handleViewDetails(item)}
       >
         <Text style={styles.detailsButtonText}>View Details</Text>
       </TouchableOpacity>
@@ -59,10 +69,10 @@ export default function Compawnionsched() {
         <Text>Loading...</Text>
       ) : (
         <FlatList
-          data={medSched}
+          data={compawnionSched}
           renderItem={renderScheduleItem}
-          keyExtractor={(schedule, index) => index.toString()} // Use index as key if no unique ID exists
-          ListEmptyComponent={<Text>No schedules available.</Text>} // Handle empty MedSched
+          keyExtractor={(item, index) => index.toString()} // Use index as key if no unique ID exists
+          ListEmptyComponent={<Text>No schedules available.</Text>} // Handle empty compawnionSched
         />
       )}
 
@@ -131,20 +141,21 @@ const styles = StyleSheet.create({
     justifyContent: 'space-evenly',
     alignItems: 'center',
     position: 'absolute',
-    bottom: 70,
-    paddingVertical: 10,
-    paddingHorizontal: 20,
-    borderRadius: 30,
+    bottom: 10,
+    paddingVertical: height * 0.01,
+    paddingHorizontal: width * 0.05,
+    borderRadius: width * 0.1,
     backgroundColor: '#C35E26',
     alignSelf: 'center',
-    width: '90%',
+    width: '100%',
+    bottom: height * 0.05,
   },
   footerButton: {
     alignItems: 'center',
-    padding: 10,
+    padding: width * 0.03,
   },
   icon: {
-    width: 70,
-    height: 30,
+    width: width * 0.2,
+    height: height * 0.05,
   },
 });

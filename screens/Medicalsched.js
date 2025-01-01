@@ -1,5 +1,16 @@
 import React, { useEffect, useState } from 'react';
-import {View,Text,StyleSheet,TouchableOpacity,Alert,FlatList,Image,Dimensions,Modal,TextInput,} from 'react-native';
+import {
+  View,
+  TextInput,
+  Text,
+  StyleSheet,
+  TouchableOpacity,
+  Alert,
+  FlatList,
+  Modal,
+  Image,
+  Dimensions
+} from 'react-native';
 import { useNavigation } from '@react-navigation/native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import axios from 'axios';
@@ -12,9 +23,13 @@ export default function MedicalSched() {
   const [medSched, setMedSched] = useState([]);
   const [loading, setLoading] = useState(true);
   const [isModalVisible, setModalVisible] = useState(false);
+  const [vetClinics, setVetClinics] = useState([]);
+  const [pets, setPets] = useState([]);
   const [form, setForm] = useState({
     title: '',
-    date: '',
+    month: '',
+    day: '',
+    year: '',
     time: '',
     vetClinic: '',
     pet: '',
@@ -27,8 +42,7 @@ export default function MedicalSched() {
         const response = await axios.get(
           `https://compawnion-backend.onrender.com/Compawnions/schedules/${companionId}`
         );
-        const data = response.data.data;
-        setMedSched(data.MedSched);
+        setMedSched(response.data.data?.MedSched || []);
         setLoading(false);
       } catch (error) {
         console.error('Error fetching schedules:', error);
@@ -40,18 +54,63 @@ export default function MedicalSched() {
     fetchMedicalSchedules();
   }, []);
 
-  const handleViewDetails = (schedule) => {
-    navigation.navigate('ScheduleDetails', { schedule });
-  };
+  useEffect(() => {
+    const fetchVetClinics = async () => {
+      try {
+        const companionId = await AsyncStorage.getItem('companionId');
+        const response = await axios.get(`https://compawnion-backend.onrender.com/Compawnions/TrustedVet/${companionId}`);
+        setVetClinics(response.data?.vetClinics || []);
+      } catch (error) {
+        console.error('Error fetching vet clinics:', error);
+        Alert.alert('Error', 'Failed to fetch vet clinics.');
+      }
+    };
 
-  const handleAddSchedule = () => {
-    setModalVisible(true);
-  };
+    fetchVetClinics();
+  }, []);
 
-  const handleSubmitSchedule = () => {
-    // Logic to submit the schedule
-    setModalVisible(false);
-    Alert.alert('Success', 'Schedule added successfully!');
+  useEffect(() => {
+    const fetchPets = async () => {
+      try {
+        const appPetID = await AsyncStorage.getItem('appPetID', appPetID);
+            const response = await axios.get(`https://compawnion-backend.onrender.com/adoptedAnimals/${appPetID}`);
+        setPets(response.data?.pets || []);
+      } catch (error) {
+        console.error('Error fetching pets:', error);
+        Alert.alert('Error', 'Failed to fetch pets.');
+      }
+    };
+
+    fetchPets();
+  }, []);
+
+  const handleSubmitSchedule = async () => {
+    try {
+      const companionId = await AsyncStorage.getItem('companionId');
+      const scheduleData = {
+        MedSched: {
+          SchedTitle: form.title,
+          SchedDate: `${form.month}/${form.day}/${form.year}`,
+          SchedTime: form.time,
+          SchedVetClinic: form.vetClinic,
+          SchedPet: form.pet,
+        },
+      };
+
+      const response = await axios.post(
+        `https://compawnion-backend.onrender.com/Compawnions/addMedSched/${companionId}`,
+        scheduleData
+      );
+
+      if (response.status === 200) {
+        Alert.alert('Success', 'Schedule added successfully!');
+        setModalVisible(false);
+        fetchMedicalSchedules();
+      }
+    } catch (error) {
+      console.error('Error submitting schedule:', error);
+      Alert.alert('Error', 'Failed to add schedule.');
+    }
   };
 
   const renderScheduleItem = ({ item }) => (
@@ -63,7 +122,7 @@ export default function MedicalSched() {
       <Text style={styles.scheduleDetails}>Vet Clinic: {item.SchedVetClinic}</Text>
       <TouchableOpacity
         style={styles.detailsButton}
-        onPress={() => handleViewDetails(item)}
+        onPress={() => navigation.navigate('Medicalinfo', { item })}
       >
         <Text style={styles.detailsButtonText}>View Details</Text>
       </TouchableOpacity>
@@ -85,7 +144,6 @@ export default function MedicalSched() {
         />
       )}
 
-      {/* Modal for Add New Schedule */}
       <Modal
         animationType="slide"
         transparent={true}
@@ -103,31 +161,65 @@ export default function MedicalSched() {
               value={form.title}
             />
 
-            <Picker
-              selectedValue={form.date}
-              onValueChange={(itemValue) => setForm({ ...form, date: itemValue })}
-              style={styles.picker}
-            >
-              <Picker.Item label="November 9, 2024" value="November 9, 2024" />
-              <Picker.Item label="November 10, 2024" value="November 10, 2024" />
-            </Picker>
+            <View style={styles.dateRow}>
+              {/* Month Picker */}
+              <Picker
+                selectedValue={form.month}
+                style={[styles.picker, styles.dateInput]}
+                onValueChange={(value) => {
+                  setForm({ ...form, month: value, day: '' }); // Reset day when month changes
+                }}
+              >
+                <Picker.Item label="MM" value="" />
+                {Array.from({ length: 12 }, (_, i) => (
+                  <Picker.Item key={i + 1} label={`${i + 1}`} value={`${i + 1}`} />
+                ))}
+              </Picker>
 
-            <Picker
-              selectedValue={form.time}
-              onValueChange={(itemValue) => setForm({ ...form, time: itemValue })}
-              style={styles.picker}
-            >
-              <Picker.Item label="8:00 AM" value="8:00 AM" />
-              <Picker.Item label="9:00 AM" value="9:00 AM" />
-            </Picker>
+              {/* Day Picker */}
+              <Picker
+                selectedValue={form.day}
+                style={[styles.picker, styles.dateInput]}
+                enabled={!!form.month} // Disable if no month is selected
+                onValueChange={(value) => setForm({ ...form, day: value })}
+              >
+                <Picker.Item label="DD" value="" />
+                {(() => {
+                  const daysInMonth = [31, 28, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31];
+                  const maxDay = daysInMonth[parseInt(form.month, 10) - 1] || 31;
+
+                  return Array.from({ length: maxDay }, (_, i) => (
+                    <Picker.Item key={i + 1} label={`${i + 1}`} value={`${i + 1}`} />
+                  ));
+                })()}
+              </Picker>
+
+              <TextInput
+                style={[styles.input, styles.dateInput]}
+                placeholder="YYYY"
+                keyboardType="numeric"
+                maxLength={4}
+                onChangeText={(text) => setForm({ ...form, year: text.replace(/[^0-9]/g, '') })}
+                value={form.year}
+              />
+            </View>
+
+            <TextInput
+              style={styles.input}
+              placeholder="Time (e.g., 8:00 AM)"
+              onChangeText={(text) => setForm({ ...form, time: text })}
+              value={form.time}
+            />
 
             <Picker
               selectedValue={form.vetClinic}
               onValueChange={(itemValue) => setForm({ ...form, vetClinic: itemValue })}
               style={styles.picker}
             >
-              <Picker.Item label="Vetlink Clinic" value="Vetlink Clinic" />
-              <Picker.Item label="Other Clinic" value="Other Clinic" />
+              <Picker.Item label="Select Vet Clinic" value="" />
+              {vetClinics && vetClinics.map((clinic, index) => (
+                <Picker.Item key={index} label={clinic.TVVetClinic} value={clinic.TVVetClinic} />
+              ))}
             </Picker>
 
             <Picker
@@ -135,9 +227,21 @@ export default function MedicalSched() {
               onValueChange={(itemValue) => setForm({ ...form, pet: itemValue })}
               style={styles.picker}
             >
-              <Picker.Item label="Ming" value="Ming" />
-              <Picker.Item label="Barky" value="Barky" />
+              <Picker.Item label="Select Pet" value="" />
+              {pets && pets.map((pet, index) => (
+                <Picker.Item key={index} label={pet.personal.name} value={pet.personal.name} />
+              ))}
             </Picker>
+
+            <TouchableOpacity
+              style={styles.modalButton}
+              onPress={() => {
+                setModalVisible(false);
+                navigation.navigate('Trustedveti');
+              }}
+            >
+              <Text style={styles.modalButtonText}>Edit Trusted Vets</Text>
+            </TouchableOpacity>
 
             <TouchableOpacity
               style={styles.addButton}
@@ -149,12 +253,10 @@ export default function MedicalSched() {
         </View>
       </Modal>
 
-      {/* Floating Add Button */}
-      <TouchableOpacity style={styles.floatingButton} onPress={handleAddSchedule}>
+      <TouchableOpacity style={styles.floatingButton} onPress={() => setModalVisible(true)}>
         <Text style={styles.floatingButtonText}>+</Text>
       </TouchableOpacity>
 
-      {/* Footer */}
       <View style={styles.footer}>
         <TouchableOpacity style={styles.footerButton} onPress={() => navigation.navigate('Medicalsched')}>
           <Image source={require('../assets/pcs/Medicalb.png')} style={styles.icon} />
@@ -169,25 +271,24 @@ export default function MedicalSched() {
     </View>
   );
 }
-
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    padding: 20,
+    padding: width * 0.05,
     backgroundColor: '#E9E9E9',
   },
   title: {
-    fontSize: 24,
+    fontSize: width * 0.07,
     fontWeight: 'bold',
     textAlign: 'center',
-    marginBottom: 20,
+    marginBottom: height * 0.02,
     color: '#C35E26',
   },
   scheduleBox: {
     backgroundColor: 'white',
-    padding: 15,
-    marginBottom: 10,
-    borderRadius: 10,
+    padding: width * 0.05,
+    marginBottom: height * 0.01,
+    borderRadius: width * 0.03,
     shadowColor: '#000',
     shadowOffset: { width: 0, height: 2 },
     shadowOpacity: 0.1,
@@ -195,23 +296,93 @@ const styles = StyleSheet.create({
     elevation: 3,
   },
   scheduleTitle: {
-    fontSize: 18,
+    fontSize: width * 0.05,
     fontWeight: 'bold',
     color: '#333',
   },
   scheduleDetails: {
-    fontSize: 14,
+    fontSize: width * 0.04,
     color: '#555',
   },
   detailsButton: {
     backgroundColor: '#C35E26',
-    paddingVertical: 8,
-    paddingHorizontal: 15,
-    borderRadius: 5,
-    marginTop: 10,
+    paddingVertical: height * 0.01,
+    paddingHorizontal: width * 0.03,
+    borderRadius: width * 0.02,
+    marginTop: height * 0.01,
     alignSelf: 'flex-end',
   },
   detailsButtonText: {
+    fontSize: width * 0.04,
+    color: 'white',
+    fontWeight: 'bold',
+  },
+  floatingButton: {
+    backgroundColor: '#C35E26',
+    width: width * 0.15,
+    height: width * 0.15,
+    borderRadius: width * 0.075,
+    justifyContent: 'center',
+    alignItems: 'center',
+    position: 'absolute',
+    bottom: height * 0.15,
+    right: width * 0.42,
+    elevation: 5,
+  },
+  floatingButtonText: {
+    fontSize: width * 0.08,
+    color: 'white',
+  },
+  modalContainer: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+    backgroundColor: 'rgba(0, 0, 0, 0.5)',
+  },
+  modalContent: {
+    backgroundColor: 'white',
+    padding: width * 0.05,
+    borderRadius: width * 0.03,
+    width: '90%',
+    alignItems: 'center',
+  },
+  modalTitle: {
+    fontSize: width * 0.06,
+    fontWeight: 'bold',
+    marginBottom: height * 0.02,
+  },
+  input: {
+    width: '100%',
+    padding: width * 0.03,
+    borderWidth: 1,
+    borderRadius: width * 0.02,
+    borderColor: '#ddd',
+    marginBottom: height * 0.01,
+  },
+  dateRow: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    width: '100%',
+    marginBottom: height * 0.01,
+  },
+  dateInput: {
+    width: '30%',
+    textAlign: 'center',
+  },
+  picker: {
+    width: '100%',
+    height: height * 0.06,
+    marginBottom: height * 0.01,
+  },
+  addButton: {
+    backgroundColor: '#C35E26',
+    paddingVertical: height * 0.015,
+    paddingHorizontal: width * 0.1,
+    borderRadius: width * 0.03,
+    marginTop: height * 0.02,
+  },
+  addButtonText: {
+    fontSize: width * 0.05,
     color: 'white',
     fontWeight: 'bold',
   },
@@ -221,77 +392,20 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     position: 'absolute',
     bottom: 10,
-    paddingVertical: 10,
-    paddingHorizontal: 20,
-    borderRadius: 30,
+    paddingVertical: height * 0.01,
+    paddingHorizontal: width * 0.05,
+    borderRadius: width * 0.1,
     backgroundColor: '#C35E26',
     alignSelf: 'center',
-    width: '90%',
+    width: '100%',
+    bottom: height * 0.05,
   },
   footerButton: {
     alignItems: 'center',
-    padding: 10,
+    padding: width * 0.03,
   },
   icon: {
-    width: 70,
-    height: 30,
-  },
-  floatingButton: {
-    backgroundColor: '#C35E26',
-    width: 50,
-    height: 50,
-    borderRadius: 30,
-    justifyContent: 'center',
-    alignItems: 'center',
-    position: 'absolute',
-    bottom: 90,
-    right: 180,
-    elevation: 5,
-  },
-  floatingButtonText: {
-    fontSize: 30,
-    color: 'white',
-  },
-  modalContainer: {
-    flex: 1,
-    justifyContent: 'center',
-    alignItems: 'center',
-    backgroundColor: 'rgba(0,0,0,0.5)',
-  },
-  modalContent: {
-    backgroundColor: 'white',
-    padding: 20,
-    borderRadius: 10,
-    width: '90%',
-    alignItems: 'center',
-  },
-  modalTitle: {
-    fontSize: 20,
-    fontWeight: 'bold',
-    marginBottom: 10,
-    color: '#C35E26',
-  },
-  input: {
-    borderWidth: 1,
-    borderColor: '#ccc',
-    borderRadius: 5,
-    width: '100%',
-    paddingHorizontal: 10,
-    paddingVertical: 5,
-    marginBottom: 10,
-  },
-  picker: {
-    width: '100%',
-    marginBottom: 10,
-  },
-  addButton: {
-    backgroundColor: '#C35E26',
-    paddingVertical: 10,
-    paddingHorizontal: 20,
-    borderRadius: 5,
-  },
-  addButtonText: {
-    color: 'white',
-    fontWeight: 'bold',
+    width: width * 0.2,
+    height: height * 0.05,
   },
 });

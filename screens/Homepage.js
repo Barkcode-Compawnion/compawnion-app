@@ -43,7 +43,6 @@ export default function Homepage({ route }) {
             console.error('Error fetching pets:', error);
         }
     }
-
     fetchPets();
 }, []);
 
@@ -70,12 +69,6 @@ export default function Homepage({ route }) {
       {/* Username and Profile Picture Section */}
       <Text style={[styles.greeting, styles.fontStyle]}>Hello,{"\n"}{username}</Text>
 
-      <TouchableOpacity onPress={handleProfilePress}>
-        <Image
-          source={profileImage ? { uri: profileImage } : require('../assets/pcs/Dog.png')} // Check if profileImage exists, use URI or fallback to local image
-          style={styles.profilePic}
-        />
-      </TouchableOpacity>
 
       {/* Donate Card */}
       <View style={styles.donateCard}>
@@ -132,14 +125,6 @@ const styles = StyleSheet.create({
   },
   fontStyle: {
     fontFamily: 'Poppins-Regular',
-  },
-  profilePic: {
-    width: width * 0.20,
-    height: width * 0.20,
-    borderRadius: 100,
-    position: 'absolute',
-    right:width * 0.40,
-    top: height *-0.10,
   },
   centerContainer: {
     flex: 1,                   // Takes up available space between "Donate" and footer
@@ -231,21 +216,21 @@ petBreed: {
     justifyContent: 'space-evenly',
     alignItems: 'center',
     position: 'absolute',
-    bottom: height * 0.05,
-    paddingVertical: 10,
-    paddingHorizontal: 20,
-    borderRadius: 30,
+    bottom: 10,
+    paddingVertical: height * 0.01,
+    paddingHorizontal: width * 0.05,
+    borderRadius: width * 0.1,
     backgroundColor: '#C35E26',
     alignSelf: 'center',
-    width: width * 0.9,
-    height: height * 0.09,
+    width: '100%',
+    bottom: height * 0.05,
   },
   footerButton: {
     alignItems: 'center',
-    padding: 10,
+    padding: width * 0.03,
   },
   icon: {
-    width: 70,
-    height: 30,
+    width: width * 0.2,
+    height: height * 0.05,
   },
 });
