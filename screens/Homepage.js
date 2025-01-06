@@ -67,7 +67,15 @@ export default function Homepage({ route }) {
   return (
     <View style={styles.container}>
       {/* Username and Profile Picture Section */}
-      <Text style={[styles.greeting, styles.fontStyle]}>Hello,{"\n"}{username}</Text>
+      <View style={styles.headers}>
+        <Text style={[styles.greeting, styles.fontStyle]}>Hello,{"\n"}{username}</Text>
+
+        <TouchableOpacity
+          style={styles.profileImage}
+          onPress={handleProfilePress}
+        ></TouchableOpacity>
+      </View>
+      
 
 
       {/* Donate Card */}
@@ -118,10 +126,23 @@ const styles = StyleSheet.create({
     padding: 20,
     backgroundColor: '#E9E9E9',
   },
+  headers: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center'
+  },
   greeting: {
+    width: width / 2,
     fontSize: width * 0.10,
     fontWeight: 'bold',
     color: '#45362F',
+
+  },
+  profileImage: {
+    width: 75,
+    height: 75,
+    borderRadius: '100%',
+    backgroundColor: '#C35E26'
   },
   fontStyle: {
     fontFamily: 'Poppins-Regular',

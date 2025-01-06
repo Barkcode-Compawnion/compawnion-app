@@ -26,24 +26,6 @@ export default function Login() {
   const [loading, setLoading] = useState(false);
   const [rememberMe, setRememberMe] = useState(false);
 
-  // Load saved credentials on component mount
-  useEffect(() => {
-    const loadSavedCredentials = async () => {
-      try {
-        const savedUsername = await AsyncStorage.getItem('savedUsername');
-        const savedPassword = await AsyncStorage.getItem('savedPassword');
-
-        if (savedUsername) setUsername(savedUsername);
-        if (savedPassword) setPassword(savedPassword);
-        if (savedUsername || savedPassword) setRememberMe(true);
-      } catch (error) {
-        console.error('Failed to load saved credentials:', error);
-      }
-    };
-
-    loadSavedCredentials();
-  }, []);
-
   // Handle login process
   const handleLoginPress = async () => {
     if (!username || !password) {
@@ -69,6 +51,7 @@ export default function Login() {
       );
 
       const data = await response.json();
+      console.log(data);
 
       if (response.ok) {
         // Save credentials if "Remember Me" is checked
@@ -98,6 +81,44 @@ export default function Login() {
       setLoading(false);
     }
   };
+  const loadSavedCredentials = async () => {
+    try {
+      const savedUsername = await AsyncStorage.getItem('savedUsername');
+      const savedPassword = await AsyncStorage.getItem('savedPassword');
+
+      if (savedUsername) setUsername(savedUsername);
+      if (savedPassword) setPassword(savedPassword);
+      if (savedUsername || savedPassword) setRememberMe(true);
+
+      const savedAuthToken = await AsyncStorage.getItem('authToken');
+      console.log(savedAuthToken);
+
+      const response = await fetch('https://compawnion-backend.onrender.com/Compawnions/authenticate', {
+        method: 'POST',
+        headers: {
+          'Content-type': 'application/json'
+        },
+        body: JSON.stringify({
+          authToken: savedAuthToken
+        })
+      });
+
+      if (!response.ok) return;
+
+      const { valid } = await response.json();
+
+      if (valid) {
+        navigation.navigate('Homepage', { username });
+      };
+    } catch (error) {
+      console.error('Failed to load saved credentials:', error);
+    }
+  };
+
+  // Load saved credentials on component mount
+  useEffect(() => {
+    loadSavedCredentials();
+  }, []);
 
   // Handle navigation for "Forgot Password" and "Signup"
   const handlePressForgot = () => navigation.navigate('Forgotpass');
@@ -142,16 +163,6 @@ export default function Login() {
         </TouchableOpacity>
       </View>
 
-      {/* Remember Me Checkbox */}
-      <View style={styles.rememberMeContainer}>
-        <CheckBox
-          value={rememberMe}
-          onValueChange={setRememberMe}
-          tintColors={{ true: '#C35E26', false: '#ddd' }}
-          style={styles.checkBox}
-        />
-        <Text style={styles.rememberMeText}>Remember Me</Text>
-      </View>
 
       {/* Login Button */}
       <TouchableOpacity
@@ -229,19 +240,6 @@ const styles = StyleSheet.create({
     fontSize: width * 0.04,
     color: '#C35E26',
     fontWeight: 'bold',
-  },
-  rememberMeContainer: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    width: '80%',
-    marginTop: height * 0.02,
-  },
-  checkBox: {
-    marginRight: 10,
-  },
-  rememberMeText: {
-    fontSize: width * 0.04,
-    color: '#45362F',
   },
   button: {
     height: height * 0.06,

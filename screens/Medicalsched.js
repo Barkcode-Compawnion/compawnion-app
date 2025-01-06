@@ -34,23 +34,22 @@ export default function MedicalSched() {
     vetClinic: '',
     pet: '',
   });
+  const fetchMedicalSchedules = async () => {
+    try {
+      const companionId = await AsyncStorage.getItem('companionId');
+      const response = await axios.get(
+        `https://compawnion-backend.onrender.com/Compawnions/schedules/${companionId}`
+      );
+      setMedSched(response.data.data?.MedSched || []);
+      setLoading(false);
+    } catch (error) {
+      console.error('Error fetching schedules:', error);
+      setLoading(false);
+      Alert.alert('Error', 'Failed to fetch schedules');
+    }
+  };
 
   useEffect(() => {
-    const fetchMedicalSchedules = async () => {
-      try {
-        const companionId = await AsyncStorage.getItem('companionId');
-        const response = await axios.get(
-          `https://compawnion-backend.onrender.com/Compawnions/schedules/${companionId}`
-        );
-        setMedSched(response.data.data?.MedSched || []);
-        setLoading(false);
-      } catch (error) {
-        console.error('Error fetching schedules:', error);
-        setLoading(false);
-        Alert.alert('Error', 'Failed to fetch schedules');
-      }
-    };
-
     fetchMedicalSchedules();
   }, []);
 
@@ -59,7 +58,9 @@ export default function MedicalSched() {
       try {
         const companionId = await AsyncStorage.getItem('companionId');
         const response = await axios.get(`https://compawnion-backend.onrender.com/Compawnions/TrustedVet/${companionId}`);
-        setVetClinics(response.data?.vetClinics || []);
+        console.log(response.data.data);
+
+        setVetClinics(response.data.data || []);
       } catch (error) {
         console.error('Error fetching vet clinics:', error);
         Alert.alert('Error', 'Failed to fetch vet clinics.');
@@ -73,8 +74,9 @@ export default function MedicalSched() {
     const fetchPets = async () => {
       try {
         const appPetID = await AsyncStorage.getItem('appPetID', appPetID);
-            const response = await axios.get(`https://compawnion-backend.onrender.com/adoptedAnimals/${appPetID}`);
-        setPets(response.data?.pets || []);
+        const response = await axios.get(`https://compawnion-backend.onrender.com/adoptedAnimals/${appPetID}`);
+        console.log(JSON.stringify(Object.values(response.data).slice(1), null, 2))
+        setPets(Object.values(response.data).slice(1) || []);
       } catch (error) {
         console.error('Error fetching pets:', error);
         Alert.alert('Error', 'Failed to fetch pets.');
@@ -161,47 +163,53 @@ export default function MedicalSched() {
               value={form.title}
             />
 
-            <View style={styles.dateRow}>
+            <View>
               {/* Month Picker */}
-              <Picker
-                selectedValue={form.month}
-                style={[styles.picker, styles.dateInput]}
-                onValueChange={(value) => {
-                  setForm({ ...form, month: value, day: '' }); // Reset day when month changes
-                }}
-              >
-                <Picker.Item label="MM" value="" />
-                {Array.from({ length: 12 }, (_, i) => (
-                  <Picker.Item key={i + 1} label={`${i + 1}`} value={`${i + 1}`} />
-                ))}
-              </Picker>
+              <View style={styles.dateRow}>
+                <Picker
+                  selectedValue={form.month}
+                  style={[styles.picker, styles.dateInput, {width: '100%'}]}
+                  onValueChange={(value) => {
+                    setForm({ ...form, month: value, day: '' }); // Reset day when month changes
+                  }}
+                >
+                  <Picker.Item label="MM" value="" enabled={false} />
+                  {/* {Array.from({ length: 12 }, (_, i) => (
+                    <Picker.Item key={i + 1} label={`${i + 1}`} value={`${i + 1}`} />
+                  ))} */}
+                  {
+                    ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December']
+                      .map((month, i) =>  <Picker.Item key={i + 1} label={`${month}`} value={`${i + 1}`} />)
+                  }
+                </Picker>
+              </View>
 
               {/* Day Picker */}
-              <Picker
-                selectedValue={form.day}
-                style={[styles.picker, styles.dateInput]}
-                enabled={!!form.month} // Disable if no month is selected
-                onValueChange={(value) => setForm({ ...form, day: value })}
-              >
-                <Picker.Item label="DD" value="" />
-                {(() => {
-                  const daysInMonth = [31, 28, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31];
-                  const maxDay = daysInMonth[parseInt(form.month, 10) - 1] || 31;
-
-                  return Array.from({ length: maxDay }, (_, i) => (
-                    <Picker.Item key={i + 1} label={`${i + 1}`} value={`${i + 1}`} />
-                  ));
-                })()}
-              </Picker>
-
-              <TextInput
-                style={[styles.input, styles.dateInput]}
-                placeholder="YYYY"
-                keyboardType="numeric"
-                maxLength={4}
-                onChangeText={(text) => setForm({ ...form, year: text.replace(/[^0-9]/g, '') })}
-                value={form.year}
-              />
+              <View style={styles.dateRow}>
+                <Picker
+                  selectedValue={form.day}
+                  style={[styles.picker, styles.dateInput]}
+                  enabled={!!form.month} // Disable if no month is selected
+                  onValueChange={(value) => setForm({ ...form, day: value })}
+                >
+                  <Picker.Item label="DD" value="" enabled={false} style={{width: '50%'}} />
+                  {(() => {
+                    const daysInMonth = [31, 28, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31];
+                    const maxDay = daysInMonth[parseInt(form.month, 10) - 1] || 31;
+                    return Array.from({ length: maxDay }, (_, i) => (
+                      <Picker.Item key={i + 1} label={`${i + 1}`} value={`${i + 1}`} />
+                    ));
+                  })()}
+                </Picker>
+                <TextInput
+                  style={[styles.input, styles.dateInput, {width: '50%'}]}
+                  placeholder="YYYY"
+                  keyboardType="numeric"
+                  maxLength={4}
+                  onChangeText={(text) => setForm({ ...form, year: text.replace(/[^0-9]/g, '') })}
+                  value={form.year}
+                />
+              </View>
             </View>
 
             <TextInput
@@ -215,10 +223,11 @@ export default function MedicalSched() {
               selectedValue={form.vetClinic}
               onValueChange={(itemValue) => setForm({ ...form, vetClinic: itemValue })}
               style={styles.picker}
+              placeholder='Select Vet Clinic'
             >
-              <Picker.Item label="Select Vet Clinic" value="" />
+              <Picker.Item label="Select Vet Clinic" value="" enabled={false} />
               {vetClinics && vetClinics.map((clinic, index) => (
-                <Picker.Item key={index} label={clinic.TVVetClinic} value={clinic.TVVetClinic} />
+                <Picker.Item key={index} label={clinic.TVVetClinic} value={clinic.TVAddress} />
               ))}
             </Picker>
 
@@ -227,7 +236,7 @@ export default function MedicalSched() {
               onValueChange={(itemValue) => setForm({ ...form, pet: itemValue })}
               style={styles.picker}
             >
-              <Picker.Item label="Select Pet" value="" />
+              <Picker.Item label="Select Pet" value="" enabled={false} />
               {pets && pets.map((pet, index) => (
                 <Picker.Item key={index} label={pet.personal.name} value={pet.personal.name} />
               ))}

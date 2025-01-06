@@ -12,34 +12,33 @@ export default function Trustedveti() {
   const [loading, setLoading] = useState(true);
   const [modalVisible, setModalVisible] = useState(false);
   const [newVet, setNewVet] = useState({ name: '', address: '' });
+  // Fetch the TrustedVet data from the backend
+  const fetchTrustedVets = async () => {
+    try {
+      const companionId = await AsyncStorage.getItem('companionId');
+      if (!companionId) {
+        throw new Error('Companion ID is missing');
+      }
+
+      const response = await axios.get(
+        `https://compawnion-backend.onrender.com/Compawnions/TrustedVet/${companionId}`
+      );
+      const data = response.data.data; // Assuming response contains 'data.data'
+
+      if (Array.isArray(data)) {
+        setTrustedVets(data);
+      } else {
+        throw new Error('Invalid data format');
+      }
+      setLoading(false);
+    } catch (error) {
+      console.error('Error fetching trusted vets:', error);
+      setLoading(false);
+      Alert.alert('Error', 'Failed to fetch trusted vets');
+    }
+  };
 
   useEffect(() => {
-    // Fetch the TrustedVet data from the backend
-    const fetchTrustedVets = async () => {
-      try {
-        const companionId = await AsyncStorage.getItem('companionId');
-        if (!companionId) {
-          throw new Error('Companion ID is missing');
-        }
-
-        const response = await axios.get(
-          `https://compawnion-backend.onrender.com/Compawnions/TrustedVet/${companionId}`
-        );
-        const data = response.data.data; // Assuming response contains 'data.data'
-
-        if (Array.isArray(data)) {
-          setTrustedVets(data);
-        } else {
-          throw new Error('Invalid data format');
-        }
-        setLoading(false);
-      } catch (error) {
-        console.error('Error fetching trusted vets:', error);
-        setLoading(false);
-        Alert.alert('Error', 'Failed to fetch trusted vets');
-      }
-    };
-
     fetchTrustedVets();
   }, []);
 

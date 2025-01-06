@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { View, Text, StyleSheet, TouchableOpacity, Alert, FlatList, Image, Dimensions } from 'react-native';
+import { View, Text, StyleSheet, TouchableOpacity, Alert, Linking, FlatList, Image, Dimensions } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import axios from 'axios';
@@ -11,39 +11,39 @@ export default function Compawnionsched() {
   const [compawnionSched, setCompawnionSched] = useState([]);
   const [loading, setLoading] = useState(true);
 
-  useEffect(() => {
-    // Fetch the CompawnionSched data from the backend
-    const fetchCompawnionSchedules = async () => {
-      try {
-        const companionId = await AsyncStorage.getItem('companionId');
-        if (!companionId) {
-          throw new Error('Companion ID is missing');
-        }
-        
-        const response = await axios.get(
-          `https://compawnion-backend.onrender.com/Compawnions/CompawnionSched/${companionId}`
-        );
-        const data = response.data.data; // Assuming response contains 'data.data'
-
-        if (Array.isArray(data)) {
-          setCompawnionSched(data);
-        } else {
-          throw new Error('Invalid data format');
-        }
-        setLoading(false);
-      } catch (error) {
-        console.error('Error fetching schedules:', error);
-        setLoading(false);
-        Alert.alert('Error', 'Failed to fetch schedules');
+  // Fetch the CompawnionSched data from the backend
+  const fetchCompawnionSchedules = async () => {
+    try {
+      const companionId = await AsyncStorage.getItem('companionId');
+      if (!companionId) {
+        throw new Error('Companion ID is missing');
       }
-    };
+      
+      const response = await axios.get(
+        `https://compawnion-backend.onrender.com/Compawnions/CompawnionSched/${companionId}`
+      );
+      const data = response.data.data; // Assuming response contains 'data.data'
 
+      if (Array.isArray(data)) {
+        setCompawnionSched(data);
+      } else {
+        throw new Error('Invalid data format');
+      }
+      setLoading(false);
+    } catch (error) {
+      console.error('Error fetching schedules:', error);
+      setLoading(false);
+      Alert.alert('Error', 'Failed to fetch schedules');
+    }
+  };
+
+  useEffect(() => {
     fetchCompawnionSchedules();
   }, []);
 
-  const handleViewDetails = (schedule) => {
+  const handleEnterRoom = (link) => {
     // Navigate to a detail screen and pass schedule data
-    navigation.navigate('ScheduleDetails', { schedule });
+    Linking.openURL(link).catch(err => console.error("Couldn't load page", err));
   };
 
   const renderScheduleItem = ({ item }) => (
@@ -54,9 +54,9 @@ export default function Compawnionsched() {
       <Text style={styles.scheduleDetails}>Gmeet Room: {item.GmeetRoom}</Text>
       <TouchableOpacity
         style={styles.detailsButton}
-        onPress={() => handleViewDetails(item)}
+        onPress={() => handleEnterRoom(item.GmeetRoom)}
       >
-        <Text style={styles.detailsButtonText}>View Details</Text>
+        <Text style={styles.detailsButtonText}>Enter Room</Text>
       </TouchableOpacity>
     </View>
   );

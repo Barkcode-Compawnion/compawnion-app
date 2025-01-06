@@ -96,8 +96,9 @@ export default function Profilescreen({ route }) {
     navigation.navigate('Changepassword');
   };
 
-  const handleLogout = () => {
+  const handleLogout = async () => {
     Alert.alert('Logout', 'You have been logged out.');
+    await AsyncStorage.removeItem('authToken');
     navigation.navigate('Login');
   };
 
