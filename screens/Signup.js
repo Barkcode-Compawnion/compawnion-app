@@ -1,7 +1,6 @@
 import React, { useState } from 'react';
-import { Text, View, TextInput, StyleSheet, TouchableOpacity, Alert, Image, Dimensions, Platform, KeyboardAvoidingView } from 'react-native';
+import { Text, View, TextInput, StyleSheet, TouchableOpacity, Alert, Image, Dimensions, Platform, ScrollView, KeyboardAvoidingView } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
-import { KeyboardAwareScrollView } from 'react-native-keyboard-aware-scroll-view';
 
 const { width, height } = Dimensions.get('window');
 
@@ -78,13 +77,10 @@ export default function Signup() {
       behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
       style={{ flex: 1 }}
     >
-      <KeyboardAwareScrollView
-        style={{ flex: 1 }}
-        enableOnAndroid={true} // For Android
-        resetScrollToCoords={{ x: 0, y: 0 }} // Reset scroll position after keyboard is dismissed
+      <ScrollView
         contentContainerStyle={styles.container}
-        keyboardShouldPersistTaps="handled" // Ensures tapping outside inputs doesn't dismiss keyboard
-        extraScrollHeight={20} // Add some space to make sure fields are not too close to the keyboard
+        keyboardShouldPersistTaps="handled"
+        showsVerticalScrollIndicator={false}
       >
         <View style={styles.header}>
           <TouchableOpacity onPress={handlePressLogin}>
@@ -152,14 +148,14 @@ export default function Signup() {
         <TouchableOpacity onPress={handlePressLogin}>
           <Text style={styles.login}>Log in</Text>
         </TouchableOpacity>
-      </KeyboardAwareScrollView>
+      </ScrollView>
     </KeyboardAvoidingView>
   );
 }
 
 const styles = StyleSheet.create({
   container: {
-    flex: 1,
+    flexGrow: 1,
     justifyContent: 'flex-start',
     padding: scaleWidth(20),
     backgroundColor: '#E9E9E9',
