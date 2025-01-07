@@ -1,17 +1,27 @@
 import React, { useState } from 'react';
-import { Text, View, TextInput, StyleSheet, TouchableOpacity, Alert, Dimensions } from 'react-native';
+import {
+    Text,
+    View,
+    TextInput,
+    StyleSheet,
+    TouchableOpacity,
+    Alert,
+    Dimensions,
+} from 'react-native';
 import { useNavigation } from '@react-navigation/native';
 
 const { width, height } = Dimensions.get('window');
 
 export default function Resetpass() {
     const navigation = useNavigation();
+    const [username, setUsername] = useState('');
     const [password, setPassword] = useState('');
     const [repassword, setRePassword] = useState('');
 
     const handlereset = async () => {
-        if (!password || !repassword) {
-            Alert.alert("Validation Error", "Please enter a password.");
+        // Validation for empty fields and mismatched passwords
+        if (!username || !password || !repassword) {
+            Alert.alert("Validation Error", "All fields are required.");
             return;
         }
 
@@ -21,30 +31,50 @@ export default function Resetpass() {
         }
 
         try {
-            const response = await fetch('https://compawnion-backend.onrender.com/update-password', {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ password }),
-            });
+            // Make the API request to reset the password
+            const response = await fetch(
+                'https://compawnion-backend.onrender.com/Compawnions/resetPassword',
+                {
+                    method: 'PUT',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        username,
+                        newPassword: password,
+                        confirmPassword: repassword,
+                    }),
+                }
+            );
 
             const data = await response.json();
 
             if (response.ok) {
-                Alert.alert("Success", "Your password has been reset successfully.");
-                navigation.navigate('Resetconfirm');
+                Alert.alert("Success", data.message);
+                navigation.navigate('Resetconfirm'); // Navigate to confirmation screen
             } else {
-                Alert.alert("Error", data.message || "An error occurred. Please try again.");
+                Alert.alert("Error", data.message || "An error occurred.");
             }
         } catch (error) {
             console.error("Error during reset request:", error);
-            Alert.alert("Network Error", "Could not connect to the server.");
+            Alert.alert(
+                "Network Error",
+                "Could not connect to the server. Please try again."
+            );
         }
     };
 
     return (
         <View style={styles.container}>
             <Text style={styles.title}>Reset Password</Text>
+            <Text style={styles.label}>Username</Text>
+            <TextInput
+                style={styles.input}
+                placeholder="Enter your username"
+                placeholderTextColor="#888888"
+                onChangeText={setUsername}
+                value={username}
+            />
 
+            <Text style={styles.label}>Enter new password</Text>
             <TextInput
                 style={styles.input}
                 placeholder="Enter new password"
@@ -53,8 +83,8 @@ export default function Resetpass() {
                 value={password}
                 secureTextEntry
             />
-            <Text style={styles.label}>Enter new password</Text>
 
+            <Text style={styles.label}>Confirm password</Text>
             <TextInput
                 style={styles.input}
                 placeholder="Confirm new password"
@@ -63,7 +93,6 @@ export default function Resetpass() {
                 value={repassword}
                 secureTextEntry
             />
-            <Text style={styles.label}>Confirm password</Text>
 
             <TouchableOpacity style={styles.button} onPress={handlereset}>
                 <Text style={styles.buttonText}>Reset Password</Text>

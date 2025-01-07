@@ -1,13 +1,37 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { View, Text, TextInput, StyleSheet, TouchableOpacity, Alert, Image } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 
-export default function Changepassword({ route }) {
+export default function Changepassword() {
   const navigation = useNavigation();
 
+  const [username, setUsername] = useState(''); // For username input
+  const [storedUsername, setStoredUsername] = useState(''); // Username from AsyncStorage
   const [currentPassword, setCurrentPassword] = useState('');
   const [newPassword, setNewPassword] = useState('');
   const [confirmNewPassword, setConfirmNewPassword] = useState('');
+  const [companionId, setCompanionId] = useState(''); // Store the companionId from AsyncStorage
+
+  // Retrieve the username and companionId from AsyncStorage
+  useEffect(() => {
+    const fetchStoredData = async () => {
+      try {
+        const storedUsername = await AsyncStorage.getItem('username');
+        const storedCompanionId = await AsyncStorage.getItem('companionId');
+        if (storedUsername) {
+          setStoredUsername(storedUsername);
+        }
+        if (storedCompanionId) {
+          setCompanionId(storedCompanionId); // Set the companionId
+        }
+      } catch (error) {
+        console.error('Error fetching data:', error);
+      }
+    };
+
+    fetchStoredData();
+  }, []);
 
   const handleChangePassword = async () => {
     if (!currentPassword || !newPassword || !confirmNewPassword) {
@@ -20,22 +44,36 @@ export default function Changepassword({ route }) {
       return;
     }
 
+    const usernameToUse = username.trim() || storedUsername;
+
+    if (!usernameToUse) {
+      Alert.alert("Error", "Username is required.");
+      return;
+    }
+
+    if (!companionId) {
+      Alert.alert("Error", "Companion ID is missing.");
+      return;
+    }
+
     try {
-      const response = await fetch('https://compawnion-backend.onrender.com/Compawnions/login', {
-        method: 'POST',
+      // Send the password change request to the API
+      const response = await fetch(`https://compawnion-backend.onrender.com/Compawnions/changePassword/${companionId}`, {
+        method: 'PUT',
         headers: {
           'Content-Type': 'application/json',
         },
         body: JSON.stringify({
-          username,
+          username: usernameToUse, // Pass username
           currentPassword,
           newPassword,
+          confirmNewPassword,
         }),
       });
 
       const result = await response.json();
 
-      if (result.success) {
+      if (response.ok) {
         Alert.alert("Success", "Your password has been changed.");
         navigation.goBack();
       } else {
@@ -54,6 +92,13 @@ export default function Changepassword({ route }) {
       </TouchableOpacity>
       <Text style={styles.title}>Change Password</Text>
 
+      <TextInput
+        style={styles.input}
+        placeholder="Type Username (optional)"
+        placeholderTextColor="#888888"
+        value={username}
+        onChangeText={setUsername}
+      />
       <TextInput
         style={styles.input}
         placeholder="Type Current Password"

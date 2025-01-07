@@ -1,30 +1,64 @@
-import React from 'react';
-import { View, Text, StyleSheet, TouchableOpacity, Image, Alert } from 'react-native';
+import React, { useEffect, useState } from 'react';
+import { View, Text, StyleSheet, TouchableOpacity, Image, Alert, ActivityIndicator } from 'react-native';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 import { useNavigation, useRoute } from '@react-navigation/native';
 import axios from 'axios';
 
 export default function Medicalinfo() {
+  const [loading, setLoading] = useState(false); // State for the loader
   const navigation = useNavigation();
   const route = useRoute();
-  const { item } = route.params; // Get the passed schedule data
+  const { item, index } = route.params;
+
+  useEffect(() => {
+    const fetchCompanionId = async () => {
+      const storedCompanionId = await AsyncStorage.getItem('companionId');
+      console.log('Stored Companion ID:', storedCompanionId);
+    };
+    fetchCompanionId();
+  }, []);
 
   const handleDelete = async () => {
+    setLoading(true); // Show loader
     try {
-      const response = await axios.delete(
-        `https://compawnion-backend.onrender.com/Compawnions/deleteMedSched/${item._id}`
-      );
-      if (response.status === 200) {
-        Alert.alert('Success', 'Schedule deleted successfully!');
+      const companionId = await AsyncStorage.getItem('companionId');
+      console.log('Retrieved Companion ID:', companionId);
+
+      if (!companionId) {
+        Alert.alert('Error', 'Companion ID not found. Please log in again.');
         navigation.goBack();
+        setLoading(false); // Hide loader
+        return;
+      }
+
+      const validIndex = parseInt(index, 10);
+      if (isNaN(validIndex)) {
+        Alert.alert('Error', 'Invalid index provided.');
+        setLoading(false); // Hide loader
+        return;
+      }
+
+      console.log(`Attempting to delete schedule for Companion ID: ${companionId}, index: ${validIndex}`);
+
+      const response = await axios.delete(
+        `https://compawnion-backend.onrender.com/Compawnions/deleteMedSched/${companionId}/${validIndex}`
+      );
+
+      if (response.status === 200) {
+        Alert.alert('Success', response.data.message || 'Schedule deleted successfully!');
+        navigation.goBack();
+      } else {
+        Alert.alert('Error', 'Unexpected response from the server.');
       }
     } catch (error) {
-      console.error('Error deleting schedule:', error);
-      Alert.alert('Error', 'Failed to delete schedule.');
+      console.error('Error deleting schedule:', error.response ? error.response.data : error);
+      Alert.alert(
+        'Error',
+        error.response?.data?.message || 'Failed to delete schedule. Please try again later.'
+      );
+    } finally {
+      setLoading(false); // Hide loader
     }
-  };
-
-  const handleReschedule = () => {
-    navigation.navigate('RescheduleScreen', { item }); // Redirect to reschedule page with item details
   };
 
   return (
@@ -33,33 +67,24 @@ export default function Medicalinfo() {
         <Image source={require('../assets/pcs/Backbutton.png')} style={styles.back} />
       </TouchableOpacity>
       <Text style={styles.title}>Medical Schedule Information</Text>
-
       <View style={styles.infoBox}>
-        <Text style={styles.sectionTitle}>Heart Surgery</Text>
+        <Text style={styles.sectionTitle}>Title</Text>
         <Text style={styles.subTitle}>{item.SchedVetClinic}</Text>
-
         <Text style={styles.sectionHeader}>Pet Information</Text>
-        <Text style={styles.infoText}>Name: {item.SchedPet}</Text>
-        <Text style={styles.infoText}>Type: Dog</Text> {/* Static placeholder */}
-        <Text style={styles.infoText}>Breed: Chihuahua</Text> {/* Static placeholder */}
-        <Text style={styles.infoText}>Age: 2 Years and 4 Months</Text> {/* Static placeholder */}
-        <Text style={styles.infoText}>Weight: 2.5 Kg</Text> {/* Static placeholder */}
-
+        <Text style={styles.infoText}>{item.SchedPet}</Text>
         <Text style={styles.sectionHeader}>Schedule Information</Text>
         <Text style={styles.infoText}>Date: {item.SchedDate}</Text>
         <Text style={styles.infoText}>Time: {item.SchedTime}</Text>
-        <Text style={styles.infoText}>
-          Vet Address: {item.SchedVetClinic}, Road 001, Commonwealth, Quezon City
-        </Text>
+        <Text style={styles.infoText}>Vet Address: {item.SchedVetClinic}</Text>
       </View>
-
-      <TouchableOpacity style={styles.rescheduleButton} onPress={handleReschedule}>
-        <Text style={styles.rescheduleButtonText}>Reschedule</Text>
-      </TouchableOpacity>
-
       <TouchableOpacity style={styles.deleteButton} onPress={handleDelete}>
         <Text style={styles.deleteButtonText}>Delete</Text>
       </TouchableOpacity>
+      {loading && (
+        <View style={styles.loadingOverlay}>
+          <ActivityIndicator size="large" color="#C35E26" />
+        </View>
+      )}
     </View>
   );
 }
@@ -115,17 +140,6 @@ const styles = StyleSheet.create({
     color: '#555',
     marginBottom: 5,
   },
-  rescheduleButton: {
-    backgroundColor: '#C35E26',
-    padding: 15,
-    borderRadius: 5,
-    marginTop: 20,
-  },
-  rescheduleButtonText: {
-    color: 'white',
-    fontSize: 18,
-    textAlign: 'center',
-  },
   deleteButton: {
     backgroundColor: '#FF4D4D',
     padding: 15,
@@ -136,5 +150,15 @@ const styles = StyleSheet.create({
     color: 'white',
     fontSize: 18,
     textAlign: 'center',
+  },
+  loadingOverlay: {
+    position: 'absolute',
+    top: 0,
+    left: 0,
+    right: 0,
+    bottom: 0,
+    backgroundColor: 'rgba(0, 0, 0, 0.5)',
+    justifyContent: 'center',
+    alignItems: 'center',
   },
 });

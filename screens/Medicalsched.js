@@ -53,6 +53,23 @@ export default function MedicalSched() {
     fetchMedicalSchedules();
   }, []);
 
+  const handleDeleteSchedule = async (index) => {
+    try {
+      const companionId = await AsyncStorage.getItem('companionId'); // Retrieve the companion ID
+      const response = await axios.delete(
+        `https://compawnion-backend.onrender.com/Compawnions/deleteMedSched/${companionId}/${index}`
+      );
+  
+      if (response.status === 200) {
+        Alert.alert('Success', 'Schedule deleted successfully!');
+        fetchMedicalSchedules(); // Refresh the schedule list
+      }
+    } catch (error) {
+      console.error('Error deleting schedule:', error);
+      Alert.alert('Error', 'Failed to delete schedule.');
+    }
+  };
+
   useEffect(() => {
     const fetchVetClinics = async () => {
       try {
@@ -115,19 +132,33 @@ export default function MedicalSched() {
     }
   };
 
-  const renderScheduleItem = ({ item }) => (
+  const renderScheduleItem = ({ item, index }) => (
     <View style={styles.scheduleBox}>
       <Text style={styles.scheduleTitle}>{item.SchedTitle}</Text>
       <Text style={styles.scheduleDetails}>Date: {item.SchedDate}</Text>
       <Text style={styles.scheduleDetails}>Time: {item.SchedTime}</Text>
       <Text style={styles.scheduleDetails}>Pet: {item.SchedPet}</Text>
       <Text style={styles.scheduleDetails}>Vet Clinic: {item.SchedVetClinic}</Text>
-      <TouchableOpacity
-        style={styles.detailsButton}
-        onPress={() => navigation.navigate('Medicalinfo', { item })}
-      >
-        <Text style={styles.detailsButtonText}>View Details</Text>
-      </TouchableOpacity>
+  
+      <View style={styles.buttonRow}>
+
+  
+        <TouchableOpacity
+          style={styles.deleteButton}
+          onPress={() =>
+            Alert.alert(
+              'Confirm Delete',
+              'Are you sure you want to delete this schedule?',
+              [
+                { text: 'Cancel', style: 'cancel' },
+                { text: 'Delete', onPress: () => handleDeleteSchedule(index) },
+              ]
+            )
+          }
+        >
+          <Text style={styles.deleteButtonText}>Delete</Text>
+        </TouchableOpacity>
+      </View>
     </View>
   );
 
@@ -416,5 +447,21 @@ const styles = StyleSheet.create({
   icon: {
     width: width * 0.2,
     height: height * 0.05,
+  },
+  buttonRow: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    marginTop: height * 0.01,
+  },
+  deleteButton: {
+    backgroundColor: '#C32626',
+    paddingVertical: height * 0.01,
+    paddingHorizontal: width * 0.03,
+    borderRadius: width * 0.02,
+  },
+  deleteButtonText: {
+    fontSize: width * 0.04,
+    color: 'white',
+    fontWeight: 'bold',
   },
 });

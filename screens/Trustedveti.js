@@ -12,6 +12,7 @@ export default function Trustedveti() {
   const [loading, setLoading] = useState(true);
   const [modalVisible, setModalVisible] = useState(false);
   const [newVet, setNewVet] = useState({ name: '', address: '' });
+
   // Fetch the TrustedVet data from the backend
   const fetchTrustedVets = async () => {
     try {
@@ -47,14 +48,14 @@ export default function Trustedveti() {
       Alert.alert('Error', 'Please fill in both fields.');
       return;
     }
-  
+
     try {
       const companionId = await AsyncStorage.getItem('companionId');
       if (!companionId) {
         Alert.alert('Error', 'Companion ID is missing.');
         return;
       }
-  
+
       const response = await axios.post(
         `https://compawnion-backend.onrender.com/Compawnions/addTrustedVet/${companionId}`,
         {
@@ -64,30 +65,65 @@ export default function Trustedveti() {
           }
         }
       );
-  
+
       if (response.status === 200) {
         Alert.alert('Success', 'New vet added');
         setModalVisible(false);
         setNewVet({ name: '', address: '' });
         fetchTrustedVets(); // Refresh the list after adding a new vet
       } else {
-        // Log the response in case the status is not 200
         console.log('Unexpected response:', response);
         Alert.alert('Error', 'Failed to add vet');
       }
     } catch (error) {
-      // Log the error and check its details
       console.error('Error adding vet:', error.response || error.message || error);
       Alert.alert('Error', 'Failed to add vet');
     }
   };
-  
-  
+
+  const handleDeleteVet = async (vetId) => {
+    try {
+      const companionId = await AsyncStorage.getItem('companionId');
+      if (!companionId) {
+        Alert.alert('Error', 'Companion ID is missing.');
+        return;
+      }
+
+      const index = trustedVets.findIndex(vet => vet._id === vetId); // Get the index of the vet to delete
+      if (index === -1) {
+        Alert.alert('Error', 'Vet not found.');
+        return;
+      }
+
+      const response = await axios.delete(
+        `https://compawnion-backend.onrender.com/Compawnions/deleteTrustedVet/${companionId}/${index}`
+      );
+
+      if (response.status === 200) {
+        Alert.alert('Success', 'Vet deleted');
+        fetchTrustedVets(); // Refresh the list after deleting the vet
+      } else {
+        console.log('Unexpected response:', response);
+        Alert.alert('Error', 'Failed to delete vet');
+      }
+    } catch (error) {
+      console.error('Error deleting vet:', error.response || error.message || error);
+      Alert.alert('Error', 'Failed to delete vet');
+    }
+  };
 
   const renderVetItem = ({ item }) => (
     <View style={styles.vetCard}>
       <Text style={styles.vetName}>{item.TVVetClinic}</Text>
       <Text style={styles.vetAddress}>{item.TVAddress}</Text>
+
+      {/* Delete Button */}
+      <TouchableOpacity
+        style={styles.deleteButton}
+        onPress={() => handleDeleteVet(item._id)} // Use the vet's _id to delete
+      >
+        <Text style={styles.deleteButtonText}>Delete</Text>
+      </TouchableOpacity>
     </View>
   );
 
@@ -160,7 +196,7 @@ export default function Trustedveti() {
         <TouchableOpacity style={styles.footerButton} onPress={() => navigation.navigate('Homepage')}>
           <Image source={require('../assets/pcs/Home.png')} style={styles.icon} />
         </TouchableOpacity>
-        <TouchableOpacity style={styles.footerButton}>
+        <TouchableOpacity style={styles.footerButton} onPress={() => navigation.navigate('Compawnionsched')}>
           <Image source={require('../assets/pcs/Calendar.png')} style={styles.icon} />
         </TouchableOpacity>
       </View>
@@ -191,6 +227,8 @@ const styles = StyleSheet.create({
     shadowOpacity: 0.1,
     shadowRadius: 5,
     elevation: 3,
+    width: width*0.9,
+    height: height * 0.09,
   },
   vetName: {
     fontSize: 18,
@@ -210,6 +248,9 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'center',
     bottom: 130,
+    left: 120,
+    width: width*0.3,
+    height: height * 0.06,
   },
   addButtonText: {
     color: '#fff',
@@ -282,5 +323,21 @@ const styles = StyleSheet.create({
   icon: {
     width: width * 0.2,
     height: height * 0.05,
+  },
+  deleteButton: {
+    marginTop: 10,
+    backgroundColor: '#C32626',
+    paddingVertical: 5,
+    paddingHorizontal: 15,
+    borderRadius: 5,
+    alignItems: 'center',
+    width: width*0.2,
+    height: height * 0.03,
+    left: 260,
+    bottom: 50,
+  },
+  deleteButtonText: {
+    color: '#fff',
+    fontWeight: 'bold',
   },
 });

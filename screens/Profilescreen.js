@@ -1,25 +1,27 @@
 import React, { useState, useEffect } from 'react';
-import { View, Text, TextInput, StyleSheet, TouchableOpacity, Image, Alert, ScrollView, Dimensions, Modal } from 'react-native';
+import { View, Text, TextInput, StyleSheet, TouchableOpacity, Image, Alert, ScrollView, Dimensions, Modal, ActivityIndicator } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
-import { launchImageLibrary } from 'react-native-image-picker'; // Import Image Picker
 import AsyncStorage from '@react-native-async-storage/async-storage';
-import axios from 'axios'; // Assuming you are using axios for HTTP requests
+import axios from 'axios';
 
-// Get screen dimensions for responsive design
 const { width, height } = Dimensions.get('window');
 
 export default function Profilescreen({ route }) {
   const navigation = useNavigation();
-  const [firstName, setFirstName] = useState('');
-  const [lastName, setLastName] = useState('');
-  const [username, setUsername] = useState('');
-  const [email, setEmail] = useState('');
-  const [phoneNumber, setPhoneNumber] = useState('');
-  const [profileImage, setProfileImage] = useState(route?.params?.profileImage || ''); // Default to current profile picture
-  const [showLogoutModal, setShowLogoutModal] = useState(false); // Modal visibility state
+  const [FirstName, setFirstName] = useState('');
+  const [LastName, setLastName] = useState('');
+  const [Username, setUsername] = useState('');
+  const [Email, setEmail] = useState('');
+  const [PhoneNumber, setPhoneNumber] = useState('');
+  const [loading, setLoading] = useState(false);
+  const [showLogoutModal, setShowLogoutModal] = useState(false);
+  const [companionId, setCompanionId] = useState(''); // Store the companionId from AsyncStorage
+  const { id } = route.params; // Retrieve the `companionId` from navigation route params
 
   useEffect(() => {
     loadProfileImage();
+    fetchUserData();
+    getCompanionId();
   }, []);
 
   const loadProfileImage = async () => {
@@ -29,68 +31,90 @@ export default function Profilescreen({ route }) {
     }
   };
 
-  // Handle changing profile picture
-  const handleChangeImage = () => {
-    launchImageLibrary({ mediaType: 'photo', quality: 0.5 }, (response) => {
-      if (response.didCancel) {
-        return;
-      }
-      if (response.errorCode) {
-        console.log('Error picking image:', response.errorMessage);
-        Alert.alert('Error', 'Failed to pick image');
-      } else {
-        const newProfileImage = response.assets[0].uri;
-        setProfileImage(newProfileImage); // Update profile picture URI
-        AsyncStorage.setItem('profileImage', newProfileImage); // Save to AsyncStorage
-      }
-    });
+  const getCompanionId = async () => {
+    const storedCompanionId = await AsyncStorage.getItem('companionId');
+    if (storedCompanionId) {
+      setCompanionId(storedCompanionId);
+    }
   };
 
-  // Save changes including profile image to backend
-  const handleSaveChanges = async () => {
-    if (!firstName || !lastName || !username || !email || !phoneNumber) {
-      Alert.alert('Validation Error', 'All fields are required.');
+  const fetchUserData = async () => {
+  setLoading(true);
+  try {
+    const authToken = await AsyncStorage.getItem('authToken');
+    const companionId = await AsyncStorage.getItem('companionId'); // Retrieve companionId from AsyncStorage
+
+    if (!companionId) {
+      Alert.alert('Error', 'Companion ID not found.');
       return;
     }
 
-    try {
-      const formData = new FormData();
-      formData.append('firstName', firstName);
-      formData.append('lastName', lastName);
-      formData.append('username', username);
-      formData.append('email', email);
-      formData.append('phoneNumber', phoneNumber);
+    const response = await axios({
+      method: 'GET',
+      url: `https://compawnion-backend.onrender.com/Compawnions/accountget/${companionId}`, // Use companionId from AsyncStorage in the URL
+      headers: {
+        Authorization: `Bearer ${authToken}`,
+      },
+    });
 
-      if (profileImage) {
-        const imageUri = profileImage;
-        const imageName = imageUri.split('/').pop();
-        const imageType = imageUri.match(/\.(\w+)$/)[1];
-        
-        const image = {
-          uri: imageUri,
-          type: `image/${imageType}`,
-          name: imageName,
-        };
-        
-        formData.append('profileImage', image);
-      }
+    if (response.data && response.data.data) {
+      const { FirstName, LastName, Username, Email, PhoneNumber } = response.data.data;
 
-      const response = await axios.post('https://your-backend-url.com/updateProfile', formData, {
-        headers: {
-          'Content-Type': 'multipart/form-data',
-        },
-      });
-
-      if (response.data.success) {
-        Alert.alert('Success', 'Your profile has been updated!');
-      } else {
-        Alert.alert('Error', 'Failed to update your profile.');
-      }
-    } catch (error) {
-      console.log('Error updating profile:', error);
-      Alert.alert('Error', 'An error occurred while updating your profile.');
+      // Set the fetched values to the state
+      setFirstName(FirstName || '');
+      setLastName(LastName || '');
+      setUsername(Username || '');
+      setEmail(Email || '');
+      setPhoneNumber(PhoneNumber || '');
+    } else {
+      Alert.alert('Error', 'No companion data received.');
     }
-  };
+  } catch (error) {
+    console.error('Error fetching user data:', error);
+    Alert.alert('Error', 'Failed to load companion data.');
+  } finally {
+    setLoading(false);
+  }
+};
+
+  
+
+const handleSaveChanges = async () => {
+  if (!FirstName || !LastName || !Username || !Email || !PhoneNumber) {
+    Alert.alert('Validation Error', 'All fields are required.');
+    return;
+  }
+
+  try {
+    const authToken = await AsyncStorage.getItem('authToken');
+    const formData = {
+      FirstName,
+      LastName,
+      Username,
+      Email,
+      PhoneNumber,
+    };
+
+    const response = await axios({
+      method: 'PUT',
+      url: `https://compawnion-backend.onrender.com/Compawnions/accountUpdate/${companionId}`, // Use companionId here
+      data: formData,
+      headers: {
+        Authorization: `Bearer ${authToken}`,
+        'Content-Type': 'application/json',
+      },
+    });
+
+    if (response.data.success) {
+      Alert.alert('Success', 'Your profile has been updated!');
+    } else {
+      Alert.alert('Success', 'Your profile has been updated!.');
+    }
+  } catch (error) {
+    console.log('Error updating profile:', error);
+    Alert.alert('Error', 'An error occurred while updating your profile.');
+  }
+};
 
   const handleChangePassword = () => {
     navigation.navigate('Changepassword');
@@ -106,6 +130,15 @@ export default function Profilescreen({ route }) {
     Alert.alert('Contact Support', 'You can reach out to barkcodecompawnion@gmail.com');
   };
 
+  if (loading) {
+    return (
+      <View style={styles.loadingContainer}>
+        <ActivityIndicator size="large" color="#C35E26" />
+        <Text>Loading...</Text>
+      </View>
+    );
+  }
+
   return (
     <ScrollView vertical showsVerticalScrollIndicator={false} contentContainerStyle={styles.container}>
       <TouchableOpacity style={styles.backButton} onPress={() => navigation.goBack()}>
@@ -113,50 +146,43 @@ export default function Profilescreen({ route }) {
       </TouchableOpacity>
       <Text style={styles.title}>Account Settings</Text>
 
-      {/* Profile Image Section */}
-      <TouchableOpacity onPress={handleChangeImage}>
-        <Image
-          source={{ uri: profileImage || 'https://placekitten.com/100/100' }} // Default to placeholder if no profile image
-          style={[styles.profileImage, { width: width * 0.25, height: width * 0.25 }]} // Dynamic size based on screen width
-        />
-      </TouchableOpacity>
-      <Text style={styles.editImageText}>Edit Image</Text>
+      <TextInput
+  style={[styles.input, { width: width * 0.8 }]}
+  value={FirstName}  // Bind to state
+  onChangeText={setFirstName}  // Handle text input change
+  placeholder={FirstName || "First Name"}  // If FirstName is empty, show the default placeholder
+/>
 
-      {/* Input fields for user information */}
-      <TextInput
-        style={[styles.input, { width: width * 0.8 }]} 
-        value={firstName}
-        onChangeText={setFirstName}
-        placeholder="First Name"
-      />
-      <TextInput
-        style={[styles.input, { width: width * 0.8 }]}
-        value={lastName}
-        onChangeText={setLastName}
-        placeholder="Last Name"
-      />
-      <TextInput
-        style={[styles.input, { width: width * 0.8 }]}
-        value={username}
-        onChangeText={setUsername}
-        placeholder="Username"
-      />
-      <TextInput
-        style={[styles.input, { width: width * 0.8 }]}
-        value={email}
-        onChangeText={setEmail}
-        placeholder="Email"
-        keyboardType="email-address"
-      />
-      <TextInput
-        style={[styles.input, { width: width * 0.8 }]}
-        value={phoneNumber}
-        onChangeText={setPhoneNumber}
-        placeholder="Phone Number"
-        keyboardType="phone-pad"
-      />
+<TextInput
+  style={[styles.input, { width: width * 0.8 }]}
+  value={LastName}  // Bind to state
+  onChangeText={setLastName}  // Handle text input change
+  placeholder={LastName || "Last Name"}  // If LastName is empty, show the default placeholder
+/>
 
-      {/* Save and other buttons */}
+<TextInput
+  style={[styles.input, { width: width * 0.8 }]}
+  value={Username}  // Bind to state
+  onChangeText={setUsername}  // Handle text input change
+  placeholder={Username || "Username"}  // If Username is empty, show the default placeholder
+/>
+
+<TextInput
+  style={[styles.input, { width: width * 0.8 }]}
+  value={Email}  // Bind to state
+  onChangeText={setEmail}  // Handle text input change
+  placeholder={Email || "Email"}  // If Email is empty, show the default placeholder
+  keyboardType="email-address"
+/>
+
+<TextInput
+  style={[styles.input, { width: width * 0.8 }]}
+  value={PhoneNumber}  // Bind to state
+  onChangeText={setPhoneNumber}  // Handle text input change
+  placeholder={PhoneNumber || "Phone Number"}  // If PhoneNumber is empty, show the default placeholder
+  keyboardType="phone-pad"
+/>
+
       <TouchableOpacity style={styles.saveButton} onPress={handleSaveChanges}>
         <Text style={styles.buttonText}>Save Changes</Text>
       </TouchableOpacity>
@@ -166,18 +192,15 @@ export default function Profilescreen({ route }) {
       <TouchableOpacity style={styles.logoutButton} onPress={() => setShowLogoutModal(true)}>
         <Text style={styles.buttonText}>Log Out</Text>
       </TouchableOpacity>
-
-      {/* Contact Support Button */}
       <TouchableOpacity onPress={handleContactSupport}>
         <Text style={styles.contactSupport}>Contact Support</Text>
       </TouchableOpacity>
 
-      {/* Logout Confirmation Modal */}
       <Modal
         transparent={true}
         visible={showLogoutModal}
         animationType="fade"
-        onRequestClose={() => setShowLogoutModal(false)} // Close modal on back press
+        onRequestClose={() => setShowLogoutModal(false)}
       >
         <View style={styles.modalOverlay}>
           <View style={styles.modalContainer}>
@@ -188,7 +211,7 @@ export default function Profilescreen({ route }) {
                 style={[styles.modalButton, styles.modalButtonYes]}
                 onPress={() => {
                   setShowLogoutModal(false);
-                  handleLogout(); // Perform logout
+                  handleLogout();
                 }}
               >
                 <Text style={styles.modalButtonText}>Yes</Text>
@@ -229,16 +252,6 @@ const styles = StyleSheet.create({
     fontWeight: 'bold',
     color: '#C35E26',
     marginTop: 20,
-  },
-  profileImage: {
-    borderRadius: 50,
-    marginTop: 20,
-  },
-  editImageText: {
-    color: '#C35E26',
-    fontSize: 14,
-    top: height * -0.01,
-    textDecorationLine: 'underline',
   },
   input: {
     height: 45,
@@ -293,8 +306,14 @@ const styles = StyleSheet.create({
   contactSupport: {
     color: '#C35E26',
     fontSize: 14,
-    marginTop: 20,
     textDecorationLine: 'underline',
+    marginTop: 20,
+  },
+  loadingContainer: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+    backgroundColor: '#fff',
   },
   modalOverlay: {
     flex: 1,
@@ -307,10 +326,9 @@ const styles = StyleSheet.create({
     backgroundColor: '#fff',
     borderRadius: 10,
     padding: 20,
-    alignItems: 'center',
   },
   modalTitle: {
-    fontSize: 18,
+    fontSize: 20,
     fontWeight: 'bold',
     color: '#C35E26',
     marginBottom: 10,
@@ -319,22 +337,20 @@ const styles = StyleSheet.create({
     fontSize: 16,
     color: '#333',
     marginBottom: 20,
-    textAlign: 'center',
   },
   modalButtonContainer: {
     flexDirection: 'row',
     justifyContent: 'space-between',
-    width: '100%',
   },
   modalButton: {
-    width: '45%',
-    height: 40,
-    justifyContent: 'center',
-    alignItems: 'center',
+    flex: 1,
+    marginHorizontal: 5,
+    padding: 10,
     borderRadius: 5,
+    alignItems: 'center',
   },
   modalButtonYes: {
-    backgroundColor: '#C35E26',
+    backgroundColor: '#C32626',
   },
   modalButtonNo: {
     backgroundColor: '#ddd',

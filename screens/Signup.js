@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
-import { Text, View, TextInput, StyleSheet, TouchableOpacity, Alert, Image, Dimensions } from 'react-native';
+import { Text, View, TextInput, StyleSheet, TouchableOpacity, Alert, Image, Dimensions, Platform, KeyboardAvoidingView } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
+import { KeyboardAwareScrollView } from 'react-native-keyboard-aware-scroll-view';
 
 const { width, height } = Dimensions.get('window');
 
@@ -73,74 +74,86 @@ export default function Signup() {
   const handlePressLogin = () => navigation.goBack();
 
   return (
-    <View style={styles.container}>
-      <View style={styles.header}>
-        <TouchableOpacity onPress={handlePressLogin}>
-          <Image source={require('../assets/pcs/Backbutton.png')} style={styles.back} />
+    <KeyboardAvoidingView
+      behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
+      style={{ flex: 1 }}
+    >
+      <KeyboardAwareScrollView
+        style={{ flex: 1 }}
+        enableOnAndroid={true} // For Android
+        resetScrollToCoords={{ x: 0, y: 0 }} // Reset scroll position after keyboard is dismissed
+        contentContainerStyle={styles.container}
+        keyboardShouldPersistTaps="handled" // Ensures tapping outside inputs doesn't dismiss keyboard
+        extraScrollHeight={20} // Add some space to make sure fields are not too close to the keyboard
+      >
+        <View style={styles.header}>
+          <TouchableOpacity onPress={handlePressLogin}>
+            <Image source={require('../assets/pcs/Backbutton.png')} style={styles.back} />
+          </TouchableOpacity>
+          <Text style={styles.title}>Sign Up</Text>
+        </View>
+
+        <Text style={styles.label}>Application ID</Text>
+        <TextInput
+          style={styles.input}
+          placeholder="Enter your Application ID"
+          placeholderTextColor="#888888"
+          onChangeText={setApplicationID}
+          value={applicationID}
+          autoCapitalize="none"
+        />
+
+        <Text style={styles.label}>Username</Text>
+        <TextInput
+          style={styles.input}
+          placeholder="Enter your username"
+          placeholderTextColor="#888888"
+          onChangeText={setUsername}
+          value={username}
+          autoCapitalize="none"
+        />
+
+        <Text style={styles.label}>Email</Text>
+        <TextInput
+          style={styles.input}
+          placeholder="Enter your email"
+          placeholderTextColor="#888888"
+          onChangeText={setEmail}
+          value={email}
+          keyboardType="email-address"
+          autoCapitalize="none"
+        />
+
+        <Text style={styles.label}>Password</Text>
+        <TextInput
+          style={styles.input}
+          placeholder="Enter your password"
+          placeholderTextColor="#888888"
+          onChangeText={setPassword}
+          value={password}
+          secureTextEntry
+        />
+
+        <Text style={styles.label}>Confirm Password</Text>
+        <TextInput
+          style={styles.input}
+          placeholder="Re-enter your password"
+          placeholderTextColor="#888888"
+          onChangeText={setConfirmPassword}
+          value={confirmPassword}
+          secureTextEntry
+        />
+
+        <TouchableOpacity style={styles.button} onPress={handleSignupPress}>
+          <Text style={styles.buttonText}>Sign Up</Text>
         </TouchableOpacity>
-        <Text style={styles.title}>Sign Up</Text>
-      </View>
 
-      <Text style={styles.label}>Application ID</Text>
-      <TextInput
-        style={styles.input}
-        placeholder="Enter your Application ID"
-        placeholderTextColor="#888888"
-        onChangeText={setApplicationID}
-        value={applicationID}
-        autoCapitalize="none"
-      />
-
-      <Text style={styles.label}>Username</Text>
-      <TextInput
-        style={styles.input}
-        placeholder="Enter your username"
-        placeholderTextColor="#888888"
-        onChangeText={setUsername}
-        value={username}
-        autoCapitalize="none"
-      />
-
-      <Text style={styles.label}>Email</Text>
-      <TextInput
-        style={styles.input}
-        placeholder="Enter your email"
-        placeholderTextColor="#888888"
-        onChangeText={setEmail}
-        value={email}
-        keyboardType="email-address"
-        autoCapitalize="none"
-      />
-
-      <Text style={styles.label}>Password</Text>
-      <TextInput
-        style={styles.input}
-        placeholder="Enter your password"
-        placeholderTextColor="#888888"
-        onChangeText={setPassword}
-        value={password}
-        secureTextEntry
-      />
-
-      <Text style={styles.label}>Confirm Password</Text>
-      <TextInput
-        style={styles.input}
-        placeholder="Re-enter your password"
-        placeholderTextColor="#888888"
-        onChangeText={setConfirmPassword}
-        value={confirmPassword}
-        secureTextEntry
-      />
-
-      <TouchableOpacity style={styles.button} onPress={handleSignupPress}>
-        <Text style={styles.buttonText}>Sign Up</Text>
-      </TouchableOpacity>
-
-      <Text style={styles.haveAcc}>Already have an account?</Text>
-      <TouchableOpacity onPress={handlePressLogin}>
-        <Text style={styles.login}>Log in</Text>
-      </TouchableOpacity>
-    </View>
+        <Text style={styles.haveAcc}>Already have an account?</Text>
+        <TouchableOpacity onPress={handlePressLogin}>
+          <Text style={styles.login}>Log in</Text>
+        </TouchableOpacity>
+      </KeyboardAwareScrollView>
+    </KeyboardAvoidingView>
   );
 }
 
