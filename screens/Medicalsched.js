@@ -15,6 +15,8 @@ import { useNavigation } from '@react-navigation/native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import axios from 'axios';
 import { Picker } from '@react-native-picker/picker';
+import { widthPercentageToDP as wp, heightPercentageToDP as hp } from 'react-native-responsive-screen';
+
 
 const { width, height } = Dimensions.get('window');
 
@@ -244,11 +246,14 @@ export default function MedicalSched() {
             </View>
 
             <TextInput
-              style={styles.input}
-              placeholder="Time (e.g., 8:00 AM)"
-              onChangeText={(text) => setForm({ ...form, time: text })}
-              value={form.time}
-            />
+             style={styles.input}
+             placeholder="Time (e.g., 8:00)"
+             keyboardType="numeric" // Ensure that only numeric keypad appears
+             maxLength={5} // Limit input to 5 characters (e.g., '12:30')
+             onChangeText={(text) => {
+             const formattedText = text.replace(/[^0-9:]/g, '').slice(0, 5);
+             setForm({ ...form, time: formattedText });}}
+             value={form.time}/>
 
             <Picker
               selectedValue={form.vetClinic}
@@ -314,21 +319,21 @@ export default function MedicalSched() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    padding: width * 0.05,
+    padding: wp(5),
     backgroundColor: '#E9E9E9',
   },
   title: {
-    fontSize: width * 0.07,
+    fontSize: wp(7),
     fontWeight: 'bold',
     textAlign: 'center',
-    marginBottom: height * 0.02,
+    marginBottom: hp(2),
     color: '#C35E26',
   },
   scheduleBox: {
     backgroundColor: 'white',
-    padding: width * 0.05,
-    marginBottom: height * 0.01,
-    borderRadius: width * 0.03,
+    padding: wp(5),
+    marginBottom: hp(1),
+    borderRadius: wp(3),
     shadowColor: '#000',
     shadowOffset: { width: 0, height: 2 },
     shadowOpacity: 0.1,
@@ -336,41 +341,41 @@ const styles = StyleSheet.create({
     elevation: 3,
   },
   scheduleTitle: {
-    fontSize: width * 0.05,
+    fontSize: wp(5),
     fontWeight: 'bold',
     color: '#333',
   },
   scheduleDetails: {
-    fontSize: width * 0.04,
+    fontSize: wp(4),
     color: '#555',
   },
   detailsButton: {
     backgroundColor: '#C35E26',
-    paddingVertical: height * 0.01,
-    paddingHorizontal: width * 0.03,
-    borderRadius: width * 0.02,
-    marginTop: height * 0.01,
+    paddingVertical: hp(1),
+    paddingHorizontal: wp(3),
+    borderRadius: wp(2),
+    marginTop: hp(1),
     alignSelf: 'flex-end',
   },
   detailsButtonText: {
-    fontSize: width * 0.04,
+    fontSize: wp(4),
     color: 'white',
     fontWeight: 'bold',
   },
   floatingButton: {
     backgroundColor: '#C35E26',
-    width: width * 0.15,
-    height: width * 0.15,
-    borderRadius: width * 0.075,
+    width: wp(15),
+    height: wp(15),
+    borderRadius: wp(7.5),
     justifyContent: 'center',
     alignItems: 'center',
     position: 'absolute',
-    bottom: height * 0.15,
-    right: width * 0.42,
+    bottom: hp(15),
+    right: wp(42),
     elevation: 5,
   },
   floatingButtonText: {
-    fontSize: width * 0.08,
+    fontSize: wp(8),
     color: 'white',
   },
   modalContainer: {
@@ -381,29 +386,29 @@ const styles = StyleSheet.create({
   },
   modalContent: {
     backgroundColor: 'white',
-    padding: width * 0.05,
-    borderRadius: width * 0.03,
+    padding: wp(5),
+    borderRadius: wp(3),
     width: '90%',
     alignItems: 'center',
   },
   modalTitle: {
-    fontSize: width * 0.06,
+    fontSize: wp(6),
     fontWeight: 'bold',
-    marginBottom: height * 0.02,
+    marginBottom: hp(2),
   },
   input: {
     width: '100%',
-    padding: width * 0.03,
+    padding: wp(3),
     borderWidth: 1,
-    borderRadius: width * 0.02,
+    borderRadius: wp(2),
     borderColor: '#ddd',
-    marginBottom: height * 0.01,
+    marginBottom: hp(1),
   },
   dateRow: {
     flexDirection: 'row',
     justifyContent: 'space-between',
     width: '100%',
-    marginBottom: height * 0.01,
+    marginBottom: hp(1),
   },
   dateInput: {
     width: '30%',
@@ -411,18 +416,18 @@ const styles = StyleSheet.create({
   },
   picker: {
     width: '100%',
-    height: height * 0.06,
-    marginBottom: height * 0.01,
+    height: hp(6),
+    marginBottom: hp(1),
   },
   addButton: {
     backgroundColor: '#C35E26',
-    paddingVertical: height * 0.015,
-    paddingHorizontal: width * 0.1,
-    borderRadius: width * 0.03,
-    marginTop: height * 0.02,
+    paddingVertical: hp(1.5),
+    paddingHorizontal: wp(10),
+    borderRadius: wp(3),
+    marginTop: hp(2),
   },
   addButtonText: {
-    fontSize: width * 0.05,
+    fontSize: wp(5),
     color: 'white',
     fontWeight: 'bold',
   },
@@ -432,35 +437,35 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     position: 'absolute',
     bottom: 10,
-    paddingVertical: height * 0.01,
-    paddingHorizontal: width * 0.05,
-    borderRadius: width * 0.1,
+    paddingVertical: hp(1),
+    paddingHorizontal: wp(5),
+    borderRadius: wp(10),
     backgroundColor: '#C35E26',
     alignSelf: 'center',
     width: '100%',
-    bottom: height * 0.05,
+    bottom: hp(5),
   },
   footerButton: {
     alignItems: 'center',
-    padding: width * 0.03,
+    padding: wp(3),
   },
   icon: {
-    width: width * 0.2,
-    height: height * 0.05,
+    width: wp(20),
+    height: hp(5),
   },
   buttonRow: {
     flexDirection: 'row',
     justifyContent: 'space-between',
-    marginTop: height * 0.01,
+    marginTop: hp(1),
   },
   deleteButton: {
     backgroundColor: '#C32626',
-    paddingVertical: height * 0.01,
-    paddingHorizontal: width * 0.03,
-    borderRadius: width * 0.02,
+    paddingVertical: hp(1),
+    paddingHorizontal: wp(3),
+    borderRadius: wp(2),
   },
   deleteButtonText: {
-    fontSize: width * 0.04,
+    fontSize: wp(4),
     color: 'white',
     fontWeight: 'bold',
   },

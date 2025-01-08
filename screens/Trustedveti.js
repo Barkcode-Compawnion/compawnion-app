@@ -3,6 +3,7 @@ import { View, Text, StyleSheet, TouchableOpacity, Alert, FlatList, Image, Dimen
 import { useNavigation } from '@react-navigation/native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import axios from 'axios';
+import { widthPercentageToDP as wp, heightPercentageToDP as hp } from 'react-native-responsive-screen';
 
 const { width, height } = Dimensions.get('window');
 
@@ -207,55 +208,56 @@ export default function Trustedveti() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    padding: 20,
+    padding: wp(5), // Adjust padding based on screen width
     backgroundColor: '#E9E9E9',
   },
   title: {
-    fontSize: 24,
+    fontSize: hp(3), // Adjust font size based on screen height
     fontWeight: 'bold',
     textAlign: 'center',
-    marginBottom: 20,
+    marginBottom: hp(2), // Adjust margin based on screen height
     color: '#C35E26',
   },
   vetCard: {
     backgroundColor: 'white',
-    padding: 15,
-    marginBottom: 10,
-    borderRadius: 10,
+    padding: wp(4), // Adjust padding based on screen width
+    marginBottom: hp(2), // Adjust margin based on screen height
+    borderRadius: wp(3), // Radius scaling based on screen width
     shadowColor: '#000',
     shadowOffset: { width: 0, height: 2 },
     shadowOpacity: 0.1,
     shadowRadius: 5,
     elevation: 3,
-    width: width*0.9,
-    height: height * 0.09,
+    width: wp(90), // Adjust width based on screen width
+    height: hp(10), // Adjust height based on screen height
   },
   vetName: {
-    fontSize: 18,
+    fontSize: hp(2.4), // Adjusted font size based on screen height
     fontWeight: 'bold',
     color: '#333',
   },
   vetAddress: {
-    fontSize: 14,
+    fontSize: hp(1.8), // Adjusted font size based on screen height
     color: '#555',
-    marginBottom: 10,
+    marginBottom: hp(1.5),
   },
   addButton: {
     backgroundColor: '#C35E26',
-    padding: 15,
-    borderRadius: 10,
-    marginTop: 20,
+    padding: wp(4), // Adjusted padding based on screen width
+    borderRadius: wp(3), // Radius scaling based on screen width
+    marginTop: hp(2), // Adjust margin based on screen height
     alignItems: 'center',
     justifyContent: 'center',
-    bottom: 130,
-    left: 120,
-    width: width*0.3,
-    height: height * 0.06,
+    position: 'absolute',
+    bottom: hp(15), // Adjust bottom position based on screen height
+    left: wp(35), // Center horizontally
+    width: wp(30), // Scalable width based on screen width
+    height: hp(6), // Scalable height based on screen height
   },
   addButtonText: {
     color: '#fff',
     fontWeight: 'bold',
-    fontSize: 16,
+    fontSize: hp(2.1), // Adjusted font size based on screen height
   },
   modalBackground: {
     flex: 1,
@@ -264,31 +266,31 @@ const styles = StyleSheet.create({
     backgroundColor: 'rgba(0, 0, 0, 0.5)',
   },
   modalContainer: {
-    width: '80%',
+    width: wp(80), // Responsive width based on screen width
     backgroundColor: '#fff',
-    padding: 20,
-    borderRadius: 10,
+    padding: wp(5), // Scalable padding based on screen width
+    borderRadius: wp(3), // Radius scaling based on screen width
     alignItems: 'center',
   },
   modalTitle: {
-    fontSize: 18,
+    fontSize: hp(2.4), // Scalable font size based on screen height
     fontWeight: 'bold',
-    marginBottom: 15,
+    marginBottom: hp(2), // Adjust margin based on screen height
   },
   input: {
     width: '100%',
-    padding: 10,
-    marginBottom: 10,
+    padding: wp(4), // Scalable padding based on screen width
+    marginBottom: hp(1.5), // Scalable margin based on screen height
     borderColor: '#ccc',
     borderWidth: 1,
     borderRadius: 5,
   },
   modalButton: {
     backgroundColor: '#C35E26',
-    padding: 10,
+    padding: wp(4), // Scalable padding based on screen width
     borderRadius: 5,
     width: '100%',
-    marginTop: 10,
+    marginTop: hp(2), // Scalable margin based on screen height
     alignItems: 'center',
   },
   modalButtonText: {
@@ -296,7 +298,7 @@ const styles = StyleSheet.create({
     fontWeight: 'bold',
   },
   closeButton: {
-    paddingTop: 15,
+    paddingTop: hp(2), // Scalable padding based on screen height
   },
   closeButtonText: {
     color: '#C35E26',
@@ -307,34 +309,33 @@ const styles = StyleSheet.create({
     justifyContent: 'space-evenly',
     alignItems: 'center',
     position: 'absolute',
-    bottom: 10,
-    paddingVertical: height * 0.01,
-    paddingHorizontal: width * 0.05,
-    borderRadius: width * 0.1,
+    bottom: hp(5), // Scalable bottom margin based on screen height
+    paddingVertical: hp(1), // Scalable vertical padding
+    paddingHorizontal: wp(5), // Scalable horizontal padding
+    borderRadius: wp(10), // Radius scaling based on screen width
     backgroundColor: '#C35E26',
     alignSelf: 'center',
     width: '100%',
-    bottom: height * 0.05,
   },
   footerButton: {
     alignItems: 'center',
-    padding: width * 0.03,
+    padding: wp(3), // Scalable padding based on screen width
   },
   icon: {
-    width: width * 0.2,
-    height: height * 0.05,
+    width: wp(20), // Scalable width based on screen width
+    height: hp(5), // Scalable height based on screen height
   },
   deleteButton: {
-    marginTop: 10,
+    marginTop: hp(1), // Adjusted margin based on screen height
     backgroundColor: '#C32626',
-    paddingVertical: 5,
-    paddingHorizontal: 15,
-    borderRadius: 5,
+    paddingVertical: hp(1), // Scalable vertical padding based on screen height
+    paddingHorizontal: wp(4), // Scalable horizontal padding based on screen width
+    borderRadius: wp(2), // Scalable radius based on screen width
     alignItems: 'center',
-    width: width*0.2,
-    height: height * 0.03,
-    left: 260,
-    bottom: 50,
+    width: wp(20), // Scalable width based on screen width
+    height: hp(4), // Scalable height based on screen height
+    left: hp(27),
+    bottom:hp(7),
   },
   deleteButtonText: {
     color: '#fff',

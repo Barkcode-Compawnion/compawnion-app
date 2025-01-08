@@ -70,10 +70,9 @@ export default function Homepage({ route }) {
       <View style={styles.headers}>
         <Text style={[styles.greeting, styles.fontStyle]}>Hello,{"\n"}{username}</Text>
 
-        <TouchableOpacity
-          style={styles.profileImage}
-          onPress={handleProfilePress}
-        ></TouchableOpacity>
+        <TouchableOpacity  onPress={handleProfilePress}>
+          <Image source={require('../assets/pcs/usericon.png')} style={styles.profileImage}/> 
+          </TouchableOpacity>
       </View>
       
 
@@ -141,8 +140,8 @@ const styles = StyleSheet.create({
   profileImage: {
     width: 75,
     height: 75,
-    borderRadius: '100%',
-    backgroundColor: '#C35E26'
+    backgroundColor: '#C35E26',
+    borderRadius: 100,
   },
   fontStyle: {
     fontFamily: 'Poppins-Regular',

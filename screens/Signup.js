@@ -92,7 +92,7 @@ export default function Signup() {
         <Text style={styles.label}>Application ID</Text>
         <TextInput
           style={styles.input}
-          placeholder="Enter your Application ID"
+          placeholder="Enter your Application Pet ID"
           placeholderTextColor="#888888"
           onChangeText={setApplicationID}
           value={applicationID}
