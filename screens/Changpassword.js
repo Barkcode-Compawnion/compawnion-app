@@ -6,14 +6,14 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 export default function Changepassword() {
   const navigation = useNavigation();
 
-  const [username, setUsername] = useState(''); // For username input
-  const [storedUsername, setStoredUsername] = useState(''); // Username from AsyncStorage
+  const [username, setUsername] = useState('');
+  const [storedUsername, setStoredUsername] = useState('');
   const [currentPassword, setCurrentPassword] = useState('');
   const [newPassword, setNewPassword] = useState('');
   const [confirmNewPassword, setConfirmNewPassword] = useState('');
-  const [companionId, setCompanionId] = useState(''); // Store the companionId from AsyncStorage
+  const [companionId, setCompanionId] = useState(''); 
 
-  // Retrieve the username and companionId from AsyncStorage
+  
   useEffect(() => {
     const fetchStoredData = async () => {
       try {
@@ -23,7 +23,7 @@ export default function Changepassword() {
           setStoredUsername(storedUsername);
         }
         if (storedCompanionId) {
-          setCompanionId(storedCompanionId); // Set the companionId
+          setCompanionId(storedCompanionId);
         }
       } catch (error) {
         console.error('Error fetching data:', error);
@@ -57,14 +57,14 @@ export default function Changepassword() {
     }
 
     try {
-      // Send the password change request to the API
+      
       const response = await fetch(`https://compawnion-backend.onrender.com/Compawnions/changePassword/${companionId}`, {
         method: 'PUT',
         headers: {
           'Content-Type': 'application/json',
         },
         body: JSON.stringify({
-          username: usernameToUse, // Pass username
+          username: usernameToUse, 
           currentPassword,
           newPassword,
           confirmNewPassword,

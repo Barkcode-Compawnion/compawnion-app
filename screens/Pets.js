@@ -11,11 +11,11 @@ export default function Pets({ route }) {
     const handleMedical = () => { navigation.navigate('Medicalsched'); };
     const handlereadmore = () => { };
 
-    // Dynamic scaling functions
+   
     const scale = (size) => size * (width / 375);
     const moderateScale = (size, factor = 0.5) => size + (scale(size) - size) * factor;
 
-    // Define breakpoints for small, medium, and large phones
+  
     const isSmallDevice = width < 360;
     const isMediumDevice = width >= 360 && width < 768;
     const isLargeDevice = width >= 768;
@@ -26,7 +26,7 @@ export default function Pets({ route }) {
             showsVerticalScrollIndicator={false}
             contentContainerStyle={[styles.container, { minHeight: height * 1.2 }]}
         >
-            {/* Back Button */}
+           
             <TouchableOpacity
                 style={[styles.backButton, { top: height * 0.05 }]}
                 onPress={() => navigation.goBack()}
@@ -37,19 +37,19 @@ export default function Pets({ route }) {
                 />
             </TouchableOpacity>
 
-            {/* Header */}
+            
             <View style={styles.headerContainer}>
                 <Text style={[styles.petName, { fontSize: moderateScale(24) }]}>{pet.personal.name}</Text>
                 <Text style={[styles.petBreed, { fontSize: moderateScale(18) }]}>{pet.personal.breed}</Text>
             </View>
 
-            {/* Pet Image */}
+            
             <Image
                 source={{ uri: pet.personal.picture }}
                 style={[styles.petImage, { width: width * 0.9, height: height * 0.35 }]}
             />
 
-            {/* Personality */}
+            
             <Text
                 style={[
                     styles.petPersonality,
@@ -59,7 +59,7 @@ export default function Pets({ route }) {
                 {pet.background.personality}
             </Text>
 
-            {/* Age and Weight */}
+           
             <View style={[styles.infoContainer, { padding: scale(15) }]}>
                 <View style={styles.infoBox}>
                     <Text style={[styles.infoLabel, { fontSize: moderateScale(16) }]}>Age</Text>
@@ -76,7 +76,7 @@ export default function Pets({ route }) {
                 </View>
             </View>
 
-            {/* Rescue and Adoption Dates */}
+           
             <View style={styles.datesContainer}>
                 <View style={[styles.dateBox, { padding: scale(10) }]}>
                     <Text style={[styles.dateLabel, { fontSize: moderateScale(14) }]}>Rescue Date</Text>
@@ -92,7 +92,7 @@ export default function Pets({ route }) {
                 </View>
             </View>
 
-            {/* Rescue Story */}
+            
             <Text
                 style={[
                     styles.storyTitle,
@@ -105,7 +105,7 @@ export default function Pets({ route }) {
                 {pet.background.rescueStory}
             </Text>
 
-            {/* Footer */}
+           
             <View
                 style={[
                     styles.footer,

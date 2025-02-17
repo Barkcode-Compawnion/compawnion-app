@@ -14,7 +14,7 @@ export default function Trustedveti() {
   const [modalVisible, setModalVisible] = useState(false);
   const [newVet, setNewVet] = useState({ name: '', address: '' });
 
-  // Fetch the TrustedVet data from the backend
+  
   const fetchTrustedVets = async () => {
     try {
       const companionId = await AsyncStorage.getItem('companionId');
@@ -25,7 +25,7 @@ export default function Trustedveti() {
       const response = await axios.get(
         `https://compawnion-backend.onrender.com/Compawnions/TrustedVet/${companionId}`
       );
-      const data = response.data.data; // Assuming response contains 'data.data'
+      const data = response.data.data; 
 
       if (Array.isArray(data)) {
         setTrustedVets(data);
@@ -71,7 +71,7 @@ export default function Trustedveti() {
         Alert.alert('Success', 'New vet added');
         setModalVisible(false);
         setNewVet({ name: '', address: '' });
-        fetchTrustedVets(); // Refresh the list after adding a new vet
+        fetchTrustedVets(); 
       } else {
         console.log('Unexpected response:', response);
         Alert.alert('Error', 'Failed to add vet');
@@ -90,7 +90,7 @@ export default function Trustedveti() {
         return;
       }
 
-      const index = trustedVets.findIndex(vet => vet._id === vetId); // Get the index of the vet to delete
+      const index = trustedVets.findIndex(vet => vet._id === vetId); 
       if (index === -1) {
         Alert.alert('Error', 'Vet not found.');
         return;
@@ -102,7 +102,7 @@ export default function Trustedveti() {
 
       if (response.status === 200) {
         Alert.alert('Success', 'Vet deleted');
-        fetchTrustedVets(); // Refresh the list after deleting the vet
+        fetchTrustedVets(); 
       } else {
         console.log('Unexpected response:', response);
         Alert.alert('Error', 'Failed to delete vet');
@@ -121,7 +121,7 @@ export default function Trustedveti() {
       {/* Delete Button */}
       <TouchableOpacity
         style={styles.deleteButton}
-        onPress={() => handleDeleteVet(item._id)} // Use the vet's _id to delete
+        onPress={() => handleDeleteVet(item._id)} 
       >
         <Text style={styles.deleteButtonText}>Delete</Text>
       </TouchableOpacity>
@@ -189,7 +189,7 @@ export default function Trustedveti() {
         </View>
       </Modal>
 
-      {/* Footer with navigation buttons */}
+      
       <View style={styles.footer}>
         <TouchableOpacity style={styles.footerButton} onPress={() => navigation.navigate('Medicalsched')}>
           <Image source={require('../assets/pcs/Medicalb.png')} style={styles.icon} />
@@ -208,56 +208,56 @@ export default function Trustedveti() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    padding: wp(5), // Adjust padding based on screen width
+    padding: wp(5), 
     backgroundColor: '#E9E9E9',
   },
   title: {
-    fontSize: hp(3), // Adjust font size based on screen height
+    fontSize: hp(3), 
     fontWeight: 'bold',
     textAlign: 'center',
-    marginBottom: hp(2), // Adjust margin based on screen height
+    marginBottom: hp(2), 
     color: '#C35E26',
   },
   vetCard: {
     backgroundColor: 'white',
-    padding: wp(4), // Adjust padding based on screen width
-    marginBottom: hp(2), // Adjust margin based on screen height
-    borderRadius: wp(3), // Radius scaling based on screen width
+    padding: wp(4), 
+    marginBottom: hp(2), 
+    borderRadius: wp(3),
     shadowColor: '#000',
     shadowOffset: { width: 0, height: 2 },
     shadowOpacity: 0.1,
     shadowRadius: 5,
     elevation: 3,
-    width: wp(90), // Adjust width based on screen width
-    height: hp(10), // Adjust height based on screen height
+    width: wp(90), 
+    height: hp(10), 
   },
   vetName: {
-    fontSize: hp(2.4), // Adjusted font size based on screen height
+    fontSize: hp(2.4), 
     fontWeight: 'bold',
     color: '#333',
   },
   vetAddress: {
-    fontSize: hp(1.8), // Adjusted font size based on screen height
+    fontSize: hp(1.8),
     color: '#555',
     marginBottom: hp(1.5),
   },
   addButton: {
     backgroundColor: '#C35E26',
-    padding: wp(4), // Adjusted padding based on screen width
-    borderRadius: wp(3), // Radius scaling based on screen width
-    marginTop: hp(2), // Adjust margin based on screen height
+    padding: wp(4), 
+    borderRadius: wp(3), 
+    marginTop: hp(2),
     alignItems: 'center',
     justifyContent: 'center',
     position: 'absolute',
-    bottom: hp(15), // Adjust bottom position based on screen height
-    left: wp(35), // Center horizontally
-    width: wp(30), // Scalable width based on screen width
-    height: hp(6), // Scalable height based on screen height
+    bottom: hp(15),
+    left: wp(35), 
+    width: wp(30), 
+    height: hp(6),
   },
   addButtonText: {
     color: '#fff',
     fontWeight: 'bold',
-    fontSize: hp(2.1), // Adjusted font size based on screen height
+    fontSize: hp(2.1),
   },
   modalBackground: {
     flex: 1,
@@ -266,31 +266,31 @@ const styles = StyleSheet.create({
     backgroundColor: 'rgba(0, 0, 0, 0.5)',
   },
   modalContainer: {
-    width: wp(80), // Responsive width based on screen width
+    width: wp(80), 
     backgroundColor: '#fff',
-    padding: wp(5), // Scalable padding based on screen width
-    borderRadius: wp(3), // Radius scaling based on screen width
+    padding: wp(5), 
+    borderRadius: wp(3), 
     alignItems: 'center',
   },
   modalTitle: {
-    fontSize: hp(2.4), // Scalable font size based on screen height
+    fontSize: hp(2.4), 
     fontWeight: 'bold',
-    marginBottom: hp(2), // Adjust margin based on screen height
+    marginBottom: hp(2), 
   },
   input: {
     width: '100%',
-    padding: wp(4), // Scalable padding based on screen width
-    marginBottom: hp(1.5), // Scalable margin based on screen height
+    padding: wp(4), 
+    marginBottom: hp(1.5), 
     borderColor: '#ccc',
     borderWidth: 1,
     borderRadius: 5,
   },
   modalButton: {
     backgroundColor: '#C35E26',
-    padding: wp(4), // Scalable padding based on screen width
+    padding: wp(4), 
     borderRadius: 5,
     width: '100%',
-    marginTop: hp(2), // Scalable margin based on screen height
+    marginTop: hp(2), 
     alignItems: 'center',
   },
   modalButtonText: {
@@ -298,7 +298,7 @@ const styles = StyleSheet.create({
     fontWeight: 'bold',
   },
   closeButton: {
-    paddingTop: hp(2), // Scalable padding based on screen height
+    paddingTop: hp(2), 
   },
   closeButtonText: {
     color: '#C35E26',
@@ -309,31 +309,31 @@ const styles = StyleSheet.create({
     justifyContent: 'space-evenly',
     alignItems: 'center',
     position: 'absolute',
-    bottom: hp(5), // Scalable bottom margin based on screen height
-    paddingVertical: hp(1), // Scalable vertical padding
-    paddingHorizontal: wp(5), // Scalable horizontal padding
-    borderRadius: wp(10), // Radius scaling based on screen width
+    bottom: hp(5), 
+    paddingVertical: hp(1), 
+    paddingHorizontal: wp(5), 
+    borderRadius: wp(10), 
     backgroundColor: '#C35E26',
     alignSelf: 'center',
     width: '100%',
   },
   footerButton: {
     alignItems: 'center',
-    padding: wp(3), // Scalable padding based on screen width
+    padding: wp(3),
   },
   icon: {
-    width: wp(20), // Scalable width based on screen width
-    height: hp(5), // Scalable height based on screen height
+    width: wp(20),
+    height: hp(5),
   },
   deleteButton: {
-    marginTop: hp(1), // Adjusted margin based on screen height
+    marginTop: hp(1), 
     backgroundColor: '#C32626',
-    paddingVertical: hp(1), // Scalable vertical padding based on screen height
-    paddingHorizontal: wp(4), // Scalable horizontal padding based on screen width
-    borderRadius: wp(2), // Scalable radius based on screen width
+    paddingVertical: hp(1), 
+    paddingHorizontal: wp(4), 
+    borderRadius: wp(2), 
     alignItems: 'center',
-    width: wp(20), // Scalable width based on screen width
-    height: hp(4), // Scalable height based on screen height
+    width: wp(20), 
+    height: hp(4), 
     left: hp(27),
     bottom:hp(7),
   },

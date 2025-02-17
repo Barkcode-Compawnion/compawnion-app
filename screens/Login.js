@@ -19,14 +19,14 @@ const { width, height } = Dimensions.get('window');
 export default function Login() {
   const navigation = useNavigation();
 
-  // State variables
+ 
   const [username, setUsername] = useState('');
   const [password, setPassword] = useState('');
   const [showPassword, setShowPassword] = useState(false);
   const [loading, setLoading] = useState(false);
   const [rememberMe, setRememberMe] = useState(false);
 
-  // Handle login process
+ 
   const handleLoginPress = async () => {
     if (!username || !password) {
       Alert.alert('Error', 'Please enter both username and password');
@@ -54,10 +54,10 @@ export default function Login() {
       console.log(data);
 
       if (response.ok) {
-        // Save credentials if "Remember Me" is checked
+        
         if (rememberMe) {
           await AsyncStorage.setItem('savedUsername', username);
-          await AsyncStorage.setItem('savedPassword', password); // Optional: save only username for security
+          await AsyncStorage.setItem('savedPassword', password);
         } else {
           await AsyncStorage.removeItem('savedUsername');
           await AsyncStorage.removeItem('savedPassword');
@@ -115,24 +115,24 @@ export default function Login() {
     }
   };
 
-  // Load saved credentials on component mount
+ 
   useEffect(() => {
     loadSavedCredentials();
   }, []);
 
-  // Handle navigation for "Forgot Password" and "Signup"
+  
   const handlePressForgot = () => navigation.navigate('Forgotpass');
   const handlePressSignup = () => navigation.navigate('Signup');
 
   return (
     <View style={styles.container}>
-      {/* Logo */}
+      
       <Image source={require('../assets/pcs/Logo.png')} style={styles.image} />
 
-      {/* Title */}
+      
       <Text style={styles.title}>Log in</Text>
 
-      {/* Username Input */}
+     
       <TextInput
         style={styles.input}
         placeholder="Username"
@@ -143,7 +143,7 @@ export default function Login() {
         autoCapitalize="none"
       />
 
-      {/* Password Input with Toggle Visibility */}
+      
       <View style={styles.passwordContainer}>
         <TextInput
           style={styles.password}

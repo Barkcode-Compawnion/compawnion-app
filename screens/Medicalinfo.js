@@ -5,7 +5,7 @@ import { useNavigation, useRoute } from '@react-navigation/native';
 import axios from 'axios';
 
 export default function Medicalinfo() {
-  const [loading, setLoading] = useState(false); // State for the loader
+  const [loading, setLoading] = useState(false); 
   const navigation = useNavigation();
   const route = useRoute();
   const { item, index } = route.params;
@@ -19,7 +19,7 @@ export default function Medicalinfo() {
   }, []);
 
   const handleDelete = async () => {
-    setLoading(true); // Show loader
+    setLoading(true); 
     try {
       const companionId = await AsyncStorage.getItem('companionId');
       console.log('Retrieved Companion ID:', companionId);
@@ -27,14 +27,14 @@ export default function Medicalinfo() {
       if (!companionId) {
         Alert.alert('Error', 'Companion ID not found. Please log in again.');
         navigation.goBack();
-        setLoading(false); // Hide loader
+        setLoading(false); 
         return;
       }
 
       const validIndex = parseInt(index, 10);
       if (isNaN(validIndex)) {
         Alert.alert('Error', 'Invalid index provided.');
-        setLoading(false); // Hide loader
+        setLoading(false);
         return;
       }
 
@@ -57,7 +57,7 @@ export default function Medicalinfo() {
         error.response?.data?.message || 'Failed to delete schedule. Please try again later.'
       );
     } finally {
-      setLoading(false); // Hide loader
+      setLoading(false); 
     }
   };
 

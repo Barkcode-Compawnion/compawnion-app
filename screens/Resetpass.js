@@ -19,7 +19,7 @@ export default function Resetpass() {
     const [repassword, setRePassword] = useState('');
 
     const handlereset = async () => {
-        // Validation for empty fields and mismatched passwords
+        
         if (!username || !password || !repassword) {
             Alert.alert("Validation Error", "All fields are required.");
             return;
@@ -31,7 +31,7 @@ export default function Resetpass() {
         }
 
         try {
-            // Make the API request to reset the password
+           
             const response = await fetch(
                 'https://compawnion-backend.onrender.com/Compawnions/resetPassword',
                 {
@@ -49,7 +49,7 @@ export default function Resetpass() {
 
             if (response.ok) {
                 Alert.alert("Success", data.message);
-                navigation.navigate('Resetconfirm'); // Navigate to confirmation screen
+                navigation.navigate('Resetconfirm'); 
             } else {
                 Alert.alert("Error", data.message || "An error occurred.");
             }

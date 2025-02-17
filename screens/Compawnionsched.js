@@ -42,7 +42,7 @@ export default function Compawnionsched() {
   }, []);
 
   const handleEnterRoom = (link) => {
-    // Navigate to a detail screen and pass schedule data
+   
     Linking.openURL(link).catch(err => console.error("Couldn't load page", err));
   };
 
@@ -71,8 +71,8 @@ export default function Compawnionsched() {
         <FlatList
           data={compawnionSched}
           renderItem={renderScheduleItem}
-          keyExtractor={(item, index) => index.toString()} // Use index as key if no unique ID exists
-          ListEmptyComponent={<Text>No schedules available.</Text>} // Handle empty compawnionSched
+          keyExtractor={(item, index) => index.toString()} 
+          ListEmptyComponent={<Text>No schedules available.</Text>} 
         />
       )}
 

@@ -15,8 +15,8 @@ export default function Profilescreen({ route }) {
   const [PhoneNumber, setPhoneNumber] = useState('');
   const [loading, setLoading] = useState(false);
   const [showLogoutModal, setShowLogoutModal] = useState(false);
-  const [companionId, setCompanionId] = useState(''); // Store the companionId from AsyncStorage
-  const { id } = route.params; // Retrieve the `companionId` from navigation route params
+  const [companionId, setCompanionId] = useState('');
+  const { id } = route.params; 
 
   useEffect(() => {
     loadProfileImage();
@@ -42,7 +42,7 @@ export default function Profilescreen({ route }) {
   setLoading(true);
   try {
     const authToken = await AsyncStorage.getItem('authToken');
-    const companionId = await AsyncStorage.getItem('companionId'); // Retrieve companionId from AsyncStorage
+    const companionId = await AsyncStorage.getItem('companionId'); 
 
     if (!companionId) {
       Alert.alert('Error', 'Companion ID not found.');
@@ -51,7 +51,7 @@ export default function Profilescreen({ route }) {
 
     const response = await axios({
       method: 'GET',
-      url: `https://compawnion-backend.onrender.com/Compawnions/accountget/${companionId}`, // Use companionId from AsyncStorage in the URL
+      url: `https://compawnion-backend.onrender.com/Compawnions/accountget/${companionId}`,
       headers: {
         Authorization: `Bearer ${authToken}`,
       },
@@ -97,7 +97,7 @@ const handleSaveChanges = async () => {
 
     const response = await axios({
       method: 'PUT',
-      url: `https://compawnion-backend.onrender.com/Compawnions/accountUpdate/${companionId}`, // Use companionId here
+      url: `https://compawnion-backend.onrender.com/Compawnions/accountUpdate/${companionId}`, 
       data: formData,
       headers: {
         Authorization: `Bearer ${authToken}`,
@@ -148,38 +148,38 @@ const handleSaveChanges = async () => {
 
       <TextInput
   style={[styles.input, { width: width * 0.8 }]}
-  value={FirstName}  // Bind to state
-  onChangeText={setFirstName}  // Handle text input change
-  placeholder={FirstName || "First Name"}  // If FirstName is empty, show the default placeholder
+  value={FirstName} 
+  onChangeText={setFirstName}  
+  placeholder={FirstName || "First Name"}  
 />
 
 <TextInput
   style={[styles.input, { width: width * 0.8 }]}
-  value={LastName}  // Bind to state
-  onChangeText={setLastName}  // Handle text input change
-  placeholder={LastName || "Last Name"}  // If LastName is empty, show the default placeholder
+  value={LastName} 
+  onChangeText={setLastName} 
+  placeholder={LastName || "Last Name"} 
 />
 
 <TextInput
   style={[styles.input, { width: width * 0.8 }]}
-  value={Username}  // Bind to state
-  onChangeText={setUsername}  // Handle text input change
-  placeholder={Username || "Username"}  // If Username is empty, show the default placeholder
+  value={Username}  
+  onChangeText={setUsername} 
+  placeholder={Username || "Username"}  
 />
 
 <TextInput
   style={[styles.input, { width: width * 0.8 }]}
-  value={Email}  // Bind to state
-  onChangeText={setEmail}  // Handle text input change
-  placeholder={Email || "Email"}  // If Email is empty, show the default placeholder
+  value={Email}  
+  onChangeText={setEmail} 
+  placeholder={Email || "Email"} 
   keyboardType="email-address"
 />
 
 <TextInput
   style={[styles.input, { width: width * 0.8 }]}
-  value={PhoneNumber}  // Bind to state
-  onChangeText={setPhoneNumber}  // Handle text input change
-  placeholder={PhoneNumber || "Phone Number"}  // If PhoneNumber is empty, show the default placeholder
+  value={PhoneNumber} 
+  onChangeText={setPhoneNumber}  
+  placeholder={PhoneNumber || "Phone Number"}  
   keyboardType="phone-pad"
 />
 

@@ -13,20 +13,20 @@ export default function Homepage({ route }) {
   const [profileImage, setProfileImage] = useState('');
   const [appPetID, setAppPetID] = useState('');
 
-  // Fetch username, profile image, and appPetID from AsyncStorage or route params
+  
   useEffect(() => {
     const fetchData = async () => {
       const storedUsername = route?.params?.username || await AsyncStorage.getItem('username');
       const storedProfileImage = await AsyncStorage.getItem('profileImage');
-      const storedAppPetID = await AsyncStorage.getItem('appPetID'); // Get appPetID from storage
+      const storedAppPetID = await AsyncStorage.getItem('appPetID'); 
       setUsername(storedUsername || 'User');
-      setProfileImage(storedProfileImage || ''); // Default profile image if not found
-      setAppPetID(storedAppPetID || ''); // Set appPetID if available
+      setProfileImage(storedProfileImage || ''); 
+      setAppPetID(storedAppPetID || ''); 
     };
     fetchData();
   }, [route]);
 
-  // Fetch pet data based on appPetID from the backend
+ 
   useEffect(() => {
     async function fetchPets() {
         try {
@@ -56,7 +56,7 @@ export default function Homepage({ route }) {
   };
 
   const handleMedical = () => {
-    // Navigate to medical schedule
+    
     navigation.navigate('Medicalsched');
   };
 
@@ -66,12 +66,12 @@ export default function Homepage({ route }) {
 
   return (
     <View style={styles.container}>
-      {/* Username and Profile Picture Section */}
+      
       <View style={styles.headers}>
         <Text style={[styles.greeting, styles.fontStyle]}>Hello,{"\n"}{username}</Text>
 
         <TouchableOpacity  onPress={handleProfilePress}>
-          <Image source={require('../assets/pcs/usericon.png')} style={styles.profileImage}/> 
+          <Image source={require('../assets/pcs/Duge.png')} style={styles.profileImage}/> 
           </TouchableOpacity>
       </View>
       
@@ -147,10 +147,10 @@ const styles = StyleSheet.create({
     fontFamily: 'Poppins-Regular',
   },
   centerContainer: {
-    flex: 1,                   // Takes up available space between "Donate" and footer
-    justifyContent: 'center',   // Centers content vertically
+    flex: 1,                 
+    justifyContent: 'center',   
     alignItems: 'center', 
-    top:height * -0.15,     // Centers content horizontally
+    top:height * -0.15,    
 },
 myPets: {
     fontSize: width * 0.09,
@@ -162,7 +162,7 @@ myPets: {
 },
 petList: {
     flexDirection: 'row',
-    alignItems: 'center',       // Center-aligns items within the row
+    alignItems: 'center',     
 },
 petCard: {
     backgroundColor: '#FFF',

@@ -57,14 +57,14 @@ export default function MedicalSched() {
 
   const handleDeleteSchedule = async (index) => {
     try {
-      const companionId = await AsyncStorage.getItem('companionId'); // Retrieve the companion ID
+      const companionId = await AsyncStorage.getItem('companionId'); 
       const response = await axios.delete(
         `https://compawnion-backend.onrender.com/Compawnions/deleteMedSched/${companionId}/${index}`
       );
   
       if (response.status === 200) {
         Alert.alert('Success', 'Schedule deleted successfully!');
-        fetchMedicalSchedules(); // Refresh the schedule list
+        fetchMedicalSchedules(); 
       }
     } catch (error) {
       console.error('Error deleting schedule:', error);
@@ -197,19 +197,17 @@ export default function MedicalSched() {
             />
 
             <View>
-              {/* Month Picker */}
+             
               <View style={styles.dateRow}>
                 <Picker
                   selectedValue={form.month}
                   style={[styles.picker, styles.dateInput, {width: '100%'}]}
                   onValueChange={(value) => {
-                    setForm({ ...form, month: value, day: '' }); // Reset day when month changes
+                    setForm({ ...form, month: value, day: '' }); 
                   }}
                 >
                   <Picker.Item label="MM" value="" enabled={false} />
-                  {/* {Array.from({ length: 12 }, (_, i) => (
-                    <Picker.Item key={i + 1} label={`${i + 1}`} value={`${i + 1}`} />
-                  ))} */}
+              
                   {
                     ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December']
                       .map((month, i) =>  <Picker.Item key={i + 1} label={`${month}`} value={`${i + 1}`} />)
@@ -217,12 +215,12 @@ export default function MedicalSched() {
                 </Picker>
               </View>
 
-              {/* Day Picker */}
+             
               <View style={styles.dateRow}>
                 <Picker
                   selectedValue={form.day}
                   style={[styles.picker, styles.dateInput]}
-                  enabled={!!form.month} // Disable if no month is selected
+                  enabled={!!form.month} 
                   onValueChange={(value) => setForm({ ...form, day: value })}
                 >
                   <Picker.Item label="DD" value="" enabled={false} style={{width: '50%'}} />
@@ -248,8 +246,8 @@ export default function MedicalSched() {
             <TextInput
              style={styles.input}
              placeholder="Time (e.g., 8:00)"
-             keyboardType="numeric" // Ensure that only numeric keypad appears
-             maxLength={5} // Limit input to 5 characters (e.g., '12:30')
+             keyboardType="numeric" 
+             maxLength={5} 
              onChangeText={(text) => {
              const formattedText = text.replace(/[^0-9:]/g, '').slice(0, 5);
              setForm({ ...form, time: formattedText });}}

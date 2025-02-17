@@ -15,7 +15,7 @@ import { useNavigation } from '@react-navigation/native';
 
 const { width, height } = Dimensions.get('window');
 
-// Scaling functions for responsiveness
+
 const scaleWidth = (size) => (width / 375) * size;
 const scaleHeight = (size) => (height / 812) * size;
 
@@ -23,10 +23,10 @@ export default function ForgotPass() {
     const navigation = useNavigation();
     const [email, setEmail] = useState('');
     const [username, setUsername] = useState('');
-    const [showModal, setShowModal] = useState(false); // Modal visibility state
-    const [resetCode, setResetCode] = useState(''); // Reset code state
+    const [showModal, setShowModal] = useState(false); 
+    const [resetCode, setResetCode] = useState('');
 
-    // Handler for Reset Password
+   
     const handlereset = async () => {
         if (!email || !username) {
             Alert.alert("Validation Error", "Please enter both email and username.");
@@ -34,18 +34,18 @@ export default function ForgotPass() {
         }
 
         try {
-            // Verify email and username with backend
+           
             const response = await fetch('https://compawnion-backend.onrender.com/Compawnions/forgotPassword', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ email, username }),  // Send email and username to backend for verification
+                body: JSON.stringify({ email, username }),  
             });
 
             const data = await response.json();
 
             if (response.ok) {
                 Alert.alert("Success", "Email and username verified. A verification code has been sent to your email.");
-                setShowModal(true);  // Show modal to enter verification code
+                setShowModal(true);  
             } else {
                 Alert.alert("Error", data.message || "An error occurred. Please try again.");
             }
@@ -59,7 +59,7 @@ export default function ForgotPass() {
         navigation.navigate('Login');
     };
 
-    // Handler for Verification Code Submission
+    
     const handleVerification = async () => {
         if (!resetCode) {
             Alert.alert("Validation Error", "Please enter the verification code.");
@@ -67,22 +67,22 @@ export default function ForgotPass() {
         }
 
         try {
-            // Send reset code to backend for verification
+            
             const response = await fetch('https://compawnion-backend.onrender.com/Compawnions/forgotPassword/verify', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ email, resetCode }), // Send email and resetCode to backend
+                body: JSON.stringify({ email, resetCode }), 
             });
 
             const data = await response.json();
 
             if (response.ok) {
                 Alert.alert("Success", "Verification successful. Please proceed with your password reset.");
-                setShowModal(false); // Close modal on successful verification
-                setResetCode(''); // Reset the reset code field
+                setShowModal(false);
+                setResetCode(''); 
 
-                // Navigate to Resetpass.js
-                navigation.navigate('Resetpass', { email }); // Pass email to Resetpass.js
+                
+                navigation.navigate('Resetpass', { email }); 
             } else {
                 Alert.alert("Error", data.message || "Invalid verification code. Please try again.");
             }

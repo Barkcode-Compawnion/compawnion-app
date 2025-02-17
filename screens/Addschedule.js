@@ -17,12 +17,11 @@ export default function Addschedule() {
   return (
     <View style={styles.container}>
 
-      {/* Main screen button to open the modal */}
       <TouchableOpacity onPress={() => setModalVisible(true)} style={styles.openButton}>
         <Text style={styles.openButtonText}>Add New Schedule</Text>
       </TouchableOpacity>
        
-      {/* Modal popup for the schedule form */}
+  
       <Modal
         animationType="slide"
         transparent={true}
